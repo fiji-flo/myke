@@ -1,0 +1,8 @@
+[package]
+name = "myke"
+version = "0.1.0"
+authors = ["Florian Merz <flomerz@gmail.com>"]
+
+[dependencies]
+clap = "~2.20.0"
+yaml-rust = "*"
