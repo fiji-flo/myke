@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate clap;
+mod core;
 
+use core::project::Project;
 
 fn main() {
     let matches = clap_app!(myke =>
@@ -11,4 +13,8 @@ fn main() {
                             (@arg LICENSE: --license "show license")
                             (@arg LOGLEVEL: --loglevel "log level, one of debug|`info`|warn|error|fatal")
     ).get_matches();
+    if let Some(yml) = matches.value_of("FILE") {
+        let project = Project::parse(yml);
+        println!("{:?}", project);
+    }
 }
