@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use std::path::Path;
 use self::yaml_rust::{Yaml,YamlLoader};
 
 #[derive(Debug)]
@@ -44,16 +45,31 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
     }
 }
 
+fn get_src_cwd_from_path(path: &str) -> (String, String) {
+    let path = Path::new(path);
+    let is_file = path.is_file();
+
+    let src = path.to_str().unwrap();
+
+    let cwd = if is_file {
+        path.parent().unwrap().to_str().unwrap()
+    } else {
+        path.to_str().unwrap()
+    };
+    (String::from(src), String::from(cwd))
+}
+
 impl Project {
     pub fn parse(path: &str) -> io::Result<Project> {
-        let mut file = try!(File::open(path));
+        let (src, cwd) = get_src_cwd_from_path(path);
+        let mut file = try!(File::open(&src));
         let mut yml_str = String::new();
         try!(file.read_to_string(&mut yml_str));
         let docs = YamlLoader::load_from_str(yml_str.as_str()).unwrap();
         let doc = &docs[0];
         Ok(Project{
-            src: String::from(path),
-            cwd: String::from(path),
+            src: src,
+            cwd: cwd,
             name: String::from(doc["project"].as_str().unwrap_or("")),
             desc: String::from(doc["desc"].as_str().unwrap_or("")),
             tags: extract_string_vec(&doc["tags"]),
