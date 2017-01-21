@@ -23,7 +23,8 @@ pub struct Project {
 
 impl Project {
     pub fn from(path: &PathBuf) -> io::Result<Project> {
-        let (src, cwd) = get_src_cwd_from_path(path);
+        let src = get_file_path(path);
+        let cwd = get_cwd(path);
         let mut file = try!(File::open(&src));
         let mut yml_str = String::new();
         try!(file.read_to_string(&mut yml_str));
@@ -71,17 +72,26 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
     }
 }
 
-fn get_src_cwd_from_path(path: &PathBuf) -> (String, String) {
+fn get_file_path(path: &PathBuf) -> String {
     let is_file = path.is_file();
 
-    let src = path.to_str().unwrap();
+    let src = if is_file {
+        String::from(path.to_str().unwrap())
+    } else {
+        String::from(path.join("myke.yml").to_str().unwrap())
+    };
+    src
+}
+
+fn get_cwd(path: &PathBuf) -> String {
+    let is_file = path.is_file();
 
     let cwd = if is_file {
-        path.parent().unwrap().to_str().unwrap()
+        String::from(path.parent().unwrap().to_str().unwrap())
     } else {
-        path.to_str().unwrap()
+        String::from(path.to_str().unwrap())
     };
-    (String::from(src), String::from(cwd))
+    cwd
 }
 
 fn add_env_file(src: &String, env_files: &mut Vec<String>) {
