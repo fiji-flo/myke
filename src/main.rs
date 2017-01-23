@@ -1,8 +1,11 @@
 #[macro_use]
 extern crate clap;
+#[macro_use]
+extern crate prettytable;
 mod core;
 
 use core::workspace::Workspace;
+use prettytable::Table;
 
 fn main() {
     let matches = clap_app!(myke =>
@@ -15,8 +18,16 @@ fn main() {
     ).get_matches();
     if let Some(yml) = matches.value_of("FILE") {
         let workspace = Workspace::parse(yml);
-        for p in workspace.projects {
-            println!("{}", p);
-        }
+        list(&workspace);
     }
+}
+
+fn list(workspace: &Workspace) {
+    let mut table = Table::new();
+    table.add_row(row![bc->"project", bc->"tags", bc->"tasks"]);
+    for p in &workspace.projects {
+        let (name, tags, tasks) = p.get_columns();
+        table.add_row(row![name, tags, tasks]);
+    }
+    table.printstd();
 }
