@@ -15,6 +15,8 @@ fn main() {
     ).get_matches();
     if let Some(yml) = matches.value_of("FILE") {
         let workspace = Workspace::parse(yml);
-        println!("{:?}", workspace);
+        for p in workspace.projects {
+            println!("{}", p);
+        }
     }
 }

@@ -3,10 +3,9 @@ use std::path::{Path,PathBuf};
 use core::project::Project;
 use std::string::String;
 
-#[derive(Debug)]
 pub struct Workspace {
-    cwd:      String,
-    projects: Vec<Project>,
+    pub cwd:      String,
+    pub projects: Vec<Project>,
 }
 
 impl Workspace {

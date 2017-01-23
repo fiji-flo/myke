@@ -6,3 +6,5 @@ authors = ["Florian Merz <flomerz@gmail.com>"]
 [dependencies]
 clap = "~2.20.0"
 yaml-rust = "*"
+itertools = "0.5.9"
+humantime = "1.0.0"
