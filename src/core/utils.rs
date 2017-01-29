@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::iter::FromIterator;
 
-pub fn add_env_file(src: &String, env_files: &mut Vec<String>) {
+pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
     let mut env = String::from(src.clone().trim_right_matches(".yml"));
     env.push_str(".env");
     env_files.push(env);
@@ -33,7 +33,7 @@ pub fn merge_env(env: &mut HashMap<String, String>, update: &HashMap<String, Str
     }
 }
 
-pub fn parse_env_file(path: &String) -> HashMap<String, String> {
+pub fn parse_env_file(path: &str) -> HashMap<String, String> {
     println!("trying to merge env from {}", &path);
     if let Ok(mut file) = File::open(path) {
         let mut env_str = String::new();
@@ -66,12 +66,12 @@ pub fn merge_vec(target: &mut Vec<String>, from: &Vec<String>) {
     }
 }
 
-pub fn prepend_path(path: &String, update: &String) -> String {
+pub fn prepend_path(path: &str, update: &str) -> String {
     let mut paths = env::split_paths(&path).collect::<Vec<_>>();
     let update_paths = env::split_paths(&update).collect::<Vec<_>>();
     paths.extend(update_paths);
     match env::join_paths(paths) {
-        Ok(s) => s.into_string().unwrap_or(path.clone()),
-        _ => path.clone()
+        Ok(s) => s.into_string().unwrap_or(path.to_owned()),
+        _ => path.to_owned()
     }
 }
