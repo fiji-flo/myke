@@ -3,11 +3,12 @@ extern crate prettytable;
 mod core;
 
 use core::query;
+use core::utils;
 use core::workspace::Workspace;
 use prettytable::Table;
 
 fn main() {
-    let queries = query::parse_queries();
+    let queries = utils::parse_param_groups();
     let file = match queries.get(0)
         .and_then(|p| { p.get(1)})
         .and_then(|fps| {

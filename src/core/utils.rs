@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::VecDeque;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -74,4 +75,23 @@ pub fn prepend_path(path: &str, update: &str) -> String {
         Ok(s) => s.into_string().unwrap_or(path.to_owned()),
         _ => path.to_owned()
     }
+}
+
+pub fn parse_param_groups() -> Vec<VecDeque<String>> {
+    let args = env::args();
+    let mut queries = Vec::new();
+    let mut current = VecDeque::new();
+
+    for arg in args {
+        if !arg.starts_with("--") && !current.is_empty() {
+            queries.push(current);
+            current = VecDeque::new();
+        }
+        current.push_back(String::from(arg));
+    }
+    queries.push(current);
+    for query in &queries {
+        println!("{:?}", query);
+    }
+    queries
 }

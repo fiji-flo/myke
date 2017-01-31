@@ -1,9 +1,10 @@
 extern crate core;
 extern crate regex;
 
+use self::regex::Regex;
 use core::project::Project;
 use core::task::Task;
-use self::regex::Regex;
+use core::workspace::Workspace;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
@@ -20,7 +21,7 @@ pub struct QueryMatch<'a> {
 }
 
 impl Query {
-    pub fn parse(mut raw: VecDeque<String>) -> Query {
+    pub fn parse(mut raw: &mut VecDeque<String>) -> Query {
         let cmd = raw.pop_front().unwrap_or(String::new());
         let mut cmds: Vec<&str> = cmd.split("/").collect();
         let task = String::from(cmds.pop().unwrap_or(""));
@@ -43,23 +44,24 @@ impl Query {
             params: params
         }
     }
+
+    pub fn search<'a>(&self, w: &'a Workspace) -> Vec<QueryMatch> {
+        let mut matches = Vec::new();
+        for p in &w.projects {
+            for (_, t) in &p.tasks {
+                if let Some(m) = self.matches(&p, &t) {
+                    matches.push(m);
+                }
+            }
+        }
+        vec!()
+    }
+
+    fn matches<'a>(&'a self, p: &'a Project, t: &'a Task) -> Option<QueryMatch> {
+        Some(QueryMatch{ project: p, task: t })
+    }
 }
 
-pub fn parse_queries() -> Vec<VecDeque<String>> {
-    let args = env::args();
-    let mut queries = Vec::new();
-    let mut current = VecDeque::new();
-
-    for arg in args {
-        if !arg.starts_with("--") && !current.is_empty() {
-            queries.push(current);
-            current = VecDeque::new();
-        }
-        current.push_back(String::from(arg));
-    }
-    queries.push(current);
-    for query in &queries {
-        println!("{:?}", query);
-    }
-    queries
+pub fn parse_queries(param_groups: &mut Vec<VecDeque<String>>) -> Vec<Query> {
+    param_groups.iter_mut().map(|mut q| { Query::parse(q) }).collect()
 }
