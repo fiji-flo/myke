@@ -1,6 +1,8 @@
+extern crate itertools;
 extern crate glob;
 extern crate regex;
 
+use self::itertools::join;
 use self::glob::Pattern;
 use self::regex::Regex;
 use myke::project::Project;
@@ -9,22 +11,23 @@ use myke::utils::ParamGroups;
 use myke::workspace::Workspace;
 use std::collections::HashMap;
 use std::collections::VecDeque;
-use std::env;
 
 pub struct Query {
-    task: String,
-    tags: Vec<String>,
-    params: HashMap<String, String>,
+    pub raw: String,
+    pub task: String,
+    pub tags: Vec<String>,
+    pub params: HashMap<String, String>,
 }
 
 pub struct QueryMatch<'a> {
-    project: &'a Project,
-    task: &'a Task
+    pub project: &'a Project,
+    pub task: &'a Task
 }
 
 impl Query {
-    pub fn parse(mut raw: &mut VecDeque<String>) -> Query {
-        let cmd = raw.pop_front().unwrap_or(String::new());
+    pub fn parse(mut rparams: &mut VecDeque<String>) -> Query {
+        let raw = join(rparams.clone(), " ");
+        let cmd = rparams.pop_front().unwrap_or(String::new());
         let mut cmds: Vec<&str> = cmd.split("/").collect();
         let task = String::from(cmds.pop().unwrap_or(""));
         let tags = cmds.iter().map(|t| { String::from(*t) }).collect();
@@ -32,7 +35,7 @@ impl Query {
         let mut params = HashMap::new();
 
         let param_re = Regex::new(r"--\(.+\)=\(.*\)").unwrap();
-        for rparam in raw {
+        for rparam in rparams {
             if let Some(cap) = param_re.captures(rparam.as_str()) {
                 if let (Some(k), Some(v)) = (cap.get(1), cap.get(2)) {
                     params.insert(String::from(k.as_str()), String::from(v.as_str()));
@@ -41,6 +44,7 @@ impl Query {
         }
 
         Query {
+            raw: raw,
             task: task,
             tags: tags,
             params: params
