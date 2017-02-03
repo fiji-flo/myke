@@ -2,9 +2,12 @@ extern crate regex;
 
 use myke::query;
 use myke::utils;
+use myke::template;
 use myke::workspace::Workspace;
 use prettytable::Table;
 use std::collections::VecDeque;
+use std::env;
+use std::path::Path;
 
 const VERSION: &'static str = "0.9";
 const USAGE: &'static str = "Usage:
@@ -41,8 +44,17 @@ pub fn action(mut param_groups: utils::ParamGroups) {
         Action::Version => println!("{}", VERSION),
         Action::DryRun(file) => run(file, param_groups, true),
         Action::Run(file) => run(file, param_groups, false),
+        Action::Template(file) => template(file),
         _ => {}
     }
+}
+
+fn template(path: String) {
+    let p = Path::new(&path);
+    match template::template_file(&p , env::vars()) {
+        Ok(Some(s)) => println!("{}", s),
+        _ => println!("\\o/")
+    };
 }
 
 fn run(path: String, mut param_groups: utils::ParamGroups, dry: bool) {
