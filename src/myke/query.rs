@@ -1,13 +1,12 @@
 extern crate glob;
-extern crate core;
 extern crate regex;
 
 use self::glob::Pattern;
 use self::regex::Regex;
-use core::project::Project;
-use core::task::Task;
-use core::utils::ParamGroups;
-use core::workspace::Workspace;
+use myke::project::Project;
+use myke::task::Task;
+use myke::utils::ParamGroups;
+use myke::workspace::Workspace;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;

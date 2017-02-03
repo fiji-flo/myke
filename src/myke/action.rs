@@ -1,9 +1,8 @@
-extern crate core;
 extern crate regex;
 
-use core::query;
-use core::utils;
-use core::workspace::Workspace;
+use myke::query;
+use myke::utils;
+use myke::workspace::Workspace;
 use prettytable::Table;
 use std::collections::VecDeque;
 

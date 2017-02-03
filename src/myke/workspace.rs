@@ -1,6 +1,5 @@
-extern crate core;
 use std::path::{Path,PathBuf};
-use core::project::Project;
+use myke::project::Project;
 use std::string::String;
 
 pub struct Workspace {

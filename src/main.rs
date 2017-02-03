@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate prettytable;
-mod core;
+mod myke;
 
-use core::action;
-use core::utils;
+use myke::action;
+use myke::utils;
 use std::env;
 
 fn main() {

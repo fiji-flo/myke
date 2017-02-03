@@ -1,9 +1,8 @@
-extern crate core;
 extern crate yaml_rust;
 extern crate itertools;
 
-use core::utils::*;
-use core::task::Task;
+use myke::utils::*;
+use myke::task::Task;
 use std::collections::HashMap;
 use std::fmt;
 use std::fs::File;
