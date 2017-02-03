@@ -4,6 +4,9 @@ use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter::FromIterator;
+use std::iter::Iterator;
+
+pub type ParamGroups = VecDeque<VecDeque<String>>;
 
 pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
     let mut env = String::from(src.clone().trim_right_matches(".yml"));
@@ -77,19 +80,18 @@ pub fn prepend_path(path: &str, update: &str) -> String {
     }
 }
 
-pub fn parse_param_groups() -> Vec<VecDeque<String>> {
-    let args = env::args();
-    let mut queries = Vec::new();
+pub fn parse_param_groups(args: Vec<String>) -> ParamGroups {
+    let mut queries = VecDeque::new();
     let mut current = VecDeque::new();
 
     for arg in args {
         if !arg.starts_with("--") && !current.is_empty() {
-            queries.push(current);
+            queries.push_back(current);
             current = VecDeque::new();
         }
-        current.push_back(String::from(arg));
+        current.push_back(arg);
     }
-    queries.push(current);
+    queries.push_back(current);
     for query in &queries {
         println!("{:?}", query);
     }

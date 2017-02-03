@@ -1,9 +1,12 @@
+extern crate glob;
 extern crate core;
 extern crate regex;
 
+use self::glob::Pattern;
 use self::regex::Regex;
 use core::project::Project;
 use core::task::Task;
+use core::utils::ParamGroups;
 use core::workspace::Workspace;
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -58,10 +61,23 @@ impl Query {
     }
 
     fn matches<'a>(&'a self, p: &'a Project, t: &'a Task) -> Option<QueryMatch> {
-        Some(QueryMatch{ project: p, task: t })
+        for tag in &self.tags {
+            let pattern = Pattern::new(tag.as_str()).unwrap();
+            let mut hit = pattern.matches(p.name.as_str());
+            for t in &p.tags {
+                hit = hit || pattern.matches(t.as_str());
+            }
+            if !hit {
+                return None;
+            }
+        }
+        if Pattern::new(self.task.as_str()).unwrap().matches(t.name.as_str()) {
+            return Some(QueryMatch{ project: p, task: t });
+        }
+        None
     }
 }
 
-pub fn parse_queries(param_groups: &mut Vec<VecDeque<String>>) -> Vec<Query> {
+pub fn parse_queries(param_groups: &mut ParamGroups) -> Vec<Query> {
     param_groups.iter_mut().map(|mut q| { Query::parse(q) }).collect()
 }

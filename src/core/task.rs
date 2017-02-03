@@ -5,13 +5,13 @@ use std::time::Duration;
 use self::yaml_rust::Yaml;
 
 pub struct Task {
-    name: String,
-    desc: String,
-    before: String,
-    after: String,
-    shell: String,
-    retry: u32,
-    retry_delay: Duration,
+    pub name: String,
+    pub desc: String,
+    pub before: String,
+    pub after: String,
+    pub shell: String,
+    pub retry: u32,
+    pub retry_delay: Duration,
 }
 
 impl Task {
