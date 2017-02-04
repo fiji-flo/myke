@@ -13,19 +13,25 @@ pub enum TemplateError {
 pub fn template_file<T: Iterator<Item=(String, String)>>(file: &Path, map: T)
                                                          -> Result<String, TemplateError> {
     let tmpl = liquid::parse_file(file, Default::default()).unwrap();
-    template(&tmpl, map)
-}
-
-pub fn template_str<T: Iterator<Item=(String, String)>>(string: &str, map: T)
-                                                        -> Result<String, TemplateError> {
-    let tmpl = liquid::parse(string, Default::default()).unwrap();
-    template(&tmpl, map)
-}
-
-pub fn template<T: Iterator<Item=(String, String)>>(tmpl: &Template, map: T)
-                                                    -> Result<String, TemplateError> {
     let mut ctx = Context::new();
+    for (k, v) in map {
+        ctx.set_val(k.as_str(), Value::Str(v));
+    }
+    template(&tmpl, ctx)
+}
 
+pub fn template_str(string: &str, map: &HashMap<String, String>)
+                    -> Result<String, TemplateError> {
+    let tmpl = liquid::parse(string, Default::default()).unwrap();
+    let mut ctx = Context::new();
+    for (k, v) in map {
+        ctx.set_val(k.as_str(), Value::Str(v.clone()));
+    }
+    template(&tmpl, ctx)
+}
+
+pub fn template(tmpl: &Template, mut ctx: Context)
+                -> Result<String, TemplateError> {
     ctx.add_filter("required", Box::new(|input, _args| {
         if let &Value::Str(ref s) = input {
             if s.len() == 0 {
@@ -35,12 +41,9 @@ pub fn template<T: Iterator<Item=(String, String)>>(tmpl: &Template, map: T)
         Ok(input.clone())
     }));
 
-    for (k, v) in map {
-        ctx.set_val(k.as_str(), Value::Str(v));
-    }
     match tmpl.render(&mut ctx) {
         Ok(Some(s)) => Ok(s),
-        Err(liquid::Error::Filter(s)) => Err(TemplateError::Required),
+        Err(liquid::Error::Filter(_)) => Err(TemplateError::Required),
         _ => Err(TemplateError::Unknown),
     }
 }

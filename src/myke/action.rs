@@ -1,5 +1,6 @@
 extern crate regex;
 
+use myke::execution;
 use myke::query;
 use myke::utils;
 use myke::template;
@@ -60,7 +61,7 @@ fn template(path: String) {
             process::exit(1);
         },
         Err(TemplateError::Unknown) =>  {
-            println!("[TEMPLATE_ERROR: unknown error :/]");
+            println!("[TEMPLATE_ERROR]: unknown error :/");
             process::exit(1);
         },
     };
@@ -73,7 +74,10 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry: bool) {
         list(&workspace);
     }
     for query in queries {
-
+        if let Err(e) = execution::execute(&workspace, &query) {
+            println!("[EXECUTION_ERROR]: {}", e);
+            process::exit(1);
+        }
     }
 
 }

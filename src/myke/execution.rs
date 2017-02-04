@@ -1,7 +1,9 @@
 use myke::project::Project;
 use myke::query::Query;
 use myke::task::Task;
+use myke::template;
 use myke::workspace::Workspace;
+use std::process::Command;
 use std::string::String;
 use std::time::Instant;
 
@@ -22,7 +24,7 @@ impl <'a>Execution<'a> {
 
     fn retry(&'a self) -> Option<()> {
         for _ in 0..self.task.retry {
-            if let None = self.executeTask() {
+            if let None = self.execute_task() {
             } else {
                 return Some(());
             }
@@ -31,14 +33,35 @@ impl <'a>Execution<'a> {
 
     }
 
-    fn executeTask(&'a self) -> Option<()> {
-        self.executeCmd(&self.task.before)
-            .and_then(|_| { self.executeCmd(&self.task.cmd) })
-            .and_then(|_| { self.executeCmd(&self.task.after) })
+    fn execute_task(&'a self) -> Option<()> {
+        self.execute_cmd(&self.task.before)
+            .and_then(|_| { self.execute_cmd(&self.task.cmd) })
+            .and_then(|_| { self.execute_cmd(&self.task.after) })
     }
 
-    fn executeCmd(&'a self, cmd: &str) -> Option<()> {
-        Some(())
+    fn execute_cmd(&'a self, cmd: &str) -> Option<()> {
+        let cmd = match template::template_str(cmd, &self.project.env) {
+            Ok(s) => s,
+            _ => String::from(cmd)
+        };
+        let mut command = Command::new("sh");
+        for (k, v) in &self.project.env {
+            command.env(k, v);
+        }
+        let status = command
+            .arg("-exc")
+            .env("MYKE_PROJECT", &self.project.name)
+            .env("MYKE_TASK", &self.task.name)
+            .env("MYKE_CWD", &self.project.cwd)
+            .args(&cmd.split(" ").collect::<Vec<_>>())
+            .current_dir(&self.project.cwd)
+            .status()
+            .expect(format!("failed to execute {}", self.task.cmd).as_str());
+        if status.success() {
+            Some(())
+        } else {
+            None
+        }
     }
 }
 
