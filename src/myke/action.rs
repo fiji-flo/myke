@@ -3,11 +3,13 @@ extern crate regex;
 use myke::query;
 use myke::utils;
 use myke::template;
+use myke::template::TemplateError;
 use myke::workspace::Workspace;
 use prettytable::Table;
 use std::collections::VecDeque;
 use std::env;
 use std::path::Path;
+use std::process;
 
 const VERSION: &'static str = "0.9";
 const USAGE: &'static str = "Usage:
@@ -52,8 +54,15 @@ pub fn action(mut param_groups: utils::ParamGroups) {
 fn template(path: String) {
     let p = Path::new(&path);
     match template::template_file(&p , env::vars()) {
-        Ok(Some(s)) => println!("{}", s),
-        _ => println!("\\o/")
+        Ok(s) => println!("{}", s),
+        Err(TemplateError::Required) => {
+            println!("[TEMPLATE_ERROR] missing required argument");
+            process::exit(1);
+        },
+        Err(TemplateError::Unknown) =>  {
+            println!("[TEMPLATE_ERROR: unknown error :/]");
+            process::exit(1);
+        },
     };
 }
 
