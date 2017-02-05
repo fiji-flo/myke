@@ -5,7 +5,6 @@ use myke::utils::*;
 use myke::task::Task;
 use std::collections::HashMap;
 use std::fmt;
-use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
@@ -126,19 +125,4 @@ fn get_file_path(path: &PathBuf) -> String {
         String::from(path.join("myke.yml").to_str().unwrap())
     };
     src
-}
-
-fn get_cwd(path: &PathBuf) -> String {
-    let is_file = path.is_file();
-    let full_path = match fs::canonicalize(path) {
-        Ok(p) => p,
-        _ => path.clone(),
-    };
-
-    let cwd = if is_file {
-        String::from(full_path.parent().unwrap().to_str().unwrap())
-    } else {
-        String::from(full_path.to_str().unwrap())
-    };
-    cwd
 }

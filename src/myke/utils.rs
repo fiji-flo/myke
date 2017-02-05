@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
+use std::ffi::OsString;
+use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter::FromIterator;
 use std::iter::Iterator;
+use std::path::PathBuf;
 
 pub type ParamGroups = VecDeque<VecDeque<String>>;
 
@@ -38,7 +41,6 @@ pub fn merge_env(env: &mut HashMap<String, String>, update: &HashMap<String, Str
 }
 
 pub fn parse_env_file(path: &str) -> HashMap<String, String> {
-    println!("trying to merge env from {}", &path);
     if let Ok(mut file) = File::open(path) {
         let mut env_str = String::new();
         match file.read_to_string(&mut env_str) {
@@ -92,8 +94,31 @@ pub fn parse_param_groups(args: Vec<String>) -> ParamGroups {
         current.push_back(arg);
     }
     queries.push_back(current);
-    for query in &queries {
-        println!("{:?}", query);
-    }
     queries
+}
+
+pub fn get_cwd(path: &PathBuf) -> String {
+    let is_file = path.is_file();
+    let full_path = match fs::canonicalize(path) {
+        Ok(p) => p,
+        _ => path.clone(),
+    };
+
+    let cwd = if is_file {
+        String::from(full_path.parent().unwrap().to_str().unwrap())
+    } else {
+        String::from(full_path.to_str().unwrap())
+    };
+    cwd
+}
+
+pub fn add_to_path(update: &String) -> OsString {
+    if let Some(path) = env::var_os("PATH") {
+        let mut paths = env::split_paths(&path).collect::<Vec<_>>();
+        paths.push(PathBuf::from(update));
+        let new_path = env::join_paths(paths).unwrap();
+        return new_path.to_owned();
+    } else {
+        return OsString::from(update);
+    }
 }

@@ -17,14 +17,14 @@ const USAGE: &'static str = "Usage:
   myke [--myke-options] [tag/]task [--task-options] ...
 
 myke options:
-      --file=     yml file to load (default: myke.yml)
-  -n, --dry-run   print tasks without running them
-      --version   print myke version
-      --template= template file to render
-      --license   show open source licenses
+  --file=     yml file to load (default: myke.yml)
+  --dry-run   print tasks without running them
+  --version   print myke version
+  --template= template file to render
+  --license   show open source licenses
 
 Help Options:
-  -h, --help      Show this help message
+  --help      Show this help message
 ";
 
 
@@ -40,7 +40,6 @@ enum Action {
 
 pub fn action(mut param_groups: utils::ParamGroups) {
     let a = parse(param_groups.pop_front().unwrap());
-    println!("{:?}", a);
 
     match a {
         Action::Help => println!("{}", USAGE),
@@ -67,14 +66,14 @@ fn template(path: String) {
     };
 }
 
-fn run(path: String, mut param_groups: utils::ParamGroups, dry: bool) {
+fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool) {
     let workspace = Workspace::parse(&path);
     let queries = query::parse_queries(&mut param_groups);
     if queries.is_empty() {
         list(&workspace);
     }
     for query in queries {
-        if let Err(e) = execution::execute(&workspace, &query) {
+        if let Err(e) = execution::execute(&workspace, &query, dry_run) {
             println!("[EXECUTION_ERROR]: {}", e);
             process::exit(1);
         }

@@ -1,5 +1,6 @@
-use std::path::{Path,PathBuf};
+use std::path::PathBuf;
 use myke::project::Project;
+use myke::utils;
 use std::string::String;
 
 pub struct Workspace {
@@ -8,16 +9,12 @@ pub struct Workspace {
 }
 
 impl Workspace {
-    pub fn parse(cwd: &str) -> Workspace {
+    pub fn parse(path: &str) -> Workspace {
         let mut projects = Vec::new();
-        let mut cwd = Path::new(cwd);
-        if cwd.is_file() {
-            cwd = cwd.parent().unwrap();
-        }
-        let cwd = cwd.to_str().unwrap();
-        Workspace::traverse(cwd, None, &mut projects);
+        let cwd = utils::get_cwd(&PathBuf::from(path));
+        Workspace::traverse(&cwd, None, &mut projects);
         Workspace{
-            cwd: String::from(cwd),
+            cwd: cwd,
             projects: projects,
         }
     }
@@ -29,7 +26,6 @@ impl Workspace {
         }
         if let Ok(p) = Project::from(&src) {
             for include in &p.discover {
-                println!("including {}", include);
                 Workspace::traverse(p.cwd.as_str(), Some(include.as_str()), projects)
             }
             projects.push(p);

@@ -19,11 +19,6 @@ pub struct Query {
     pub params: HashMap<String, String>,
 }
 
-pub struct QueryMatch<'a> {
-    pub project: &'a Project,
-    pub task: &'a Task
-}
-
 impl Query {
     pub fn parse(mut rparams: &mut VecDeque<String>) -> Query {
         let raw = join(rparams.clone(), " ");
@@ -51,19 +46,23 @@ impl Query {
         }
     }
 
-    pub fn search<'a>(&self, w: &'a Workspace) -> Vec<QueryMatch> {
+    pub fn search<'a>(&self, w: &'a Workspace) -> Vec<(&'a Project, &'a Task)> {
         let mut matches = Vec::new();
         for p in &w.projects {
-            for (_, t) in &p.tasks {
-                if let Some(m) = self.matches(&p, &t) {
-                    matches.push(m);
-                }
-            }
+            matches.append(&mut self.search_in_project(&p));
         }
-        vec!()
+        matches
     }
 
-    fn matches<'a>(&'a self, p: &'a Project, t: &'a Task) -> Option<QueryMatch> {
+    fn search_in_project<'a>(&self, p: &'a Project) -> Vec<(&'a Project, &'a Task)> {
+        p.tasks.iter().filter_map(
+            |(_, t)| {
+                self.matches_(&p, &t)
+            }
+        ).collect()
+    }
+
+    fn matches_<'a>(&self, p: &'a Project, t: &'a Task) -> Option<(&'a Project, &'a Task)> {
         for tag in &self.tags {
             let pattern = Pattern::new(tag.as_str()).unwrap();
             let mut hit = pattern.matches(p.name.as_str());
@@ -75,7 +74,7 @@ impl Query {
             }
         }
         if Pattern::new(self.task.as_str()).unwrap().matches(t.name.as_str()) {
-            return Some(QueryMatch{ project: p, task: t });
+            return Some((p ,t));
         }
         None
     }
