@@ -55,6 +55,20 @@ impl <'a>Execution<'a> {
             .and_then(|_| { self.execute_cmd(&self.task.after) })
     }
 
+    #[cfg(windows)]
+    fn shell() -> Command {
+        let mut cmd = Command::new("cmd.exe");
+        cmd.arg("/c");
+        cmd
+    }
+
+    #[cfg(unix)]
+    fn shell() -> Command {
+        let mut cmd = Command::new("sh");
+        cmd.arg("-exc");
+        cmd
+    }
+
     fn execute_cmd(&'a self, cmd: &str) -> Option<()> {
         if cmd == "" {
             return Some(());
@@ -69,7 +83,7 @@ impl <'a>Execution<'a> {
         if self.dry_run {
             cmd = format!("echo {}", cmd);
         }
-        let mut command = Command::new("sh");
+        let mut command = Execution::shell();
         for (k, v) in &self.project.env {
             if k == "PATH" {
                 command.env(k, utils::add_to_path(v));
@@ -78,7 +92,6 @@ impl <'a>Execution<'a> {
             }
         }
         let status = command
-            .arg("-exc")
             .env("myke", current_exe().unwrap().to_str().unwrap())
             .env("MYKE_PROJECT", &self.project.name)
             .env("MYKE_TASK", &self.task.name)

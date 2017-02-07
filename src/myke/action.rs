@@ -83,7 +83,7 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool) {
 
 pub fn list(workspace: &Workspace) {
     let mut table = Table::new();
-    table.add_row(row![bc->"project", bc->"tags", bc->"tasks"]);
+    table.add_row(row![bc->"PROJECT", bc->"TAGS", bc->"TASKS"]);
     for p in &workspace.projects {
         let (name, tags, tasks) = p.get_columns();
         table.add_row(row![name, tags, tasks]);
