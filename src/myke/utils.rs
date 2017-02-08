@@ -64,7 +64,7 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
     HashMap::new()
 }
 
-pub fn merge_vec(target: &mut Vec<String>, from: &Vec<String>) {
+pub fn merge_vec<T: Eq + Clone>(target: &mut Vec<T>, from: &Vec<T>) {
     for x in from {
         if !target.into_iter().any(|y| { x == y}) {
             target.push(x.clone());
