@@ -99,7 +99,7 @@ impl <'a>Execution<'a> {
             .arg(cmd)
             .current_dir(&self.project.cwd)
             .status()
-            .expect(format!("failed to execute {}", self.task.cmd).as_str());
+            .expect(format!("failed to execute {}", self.task.cmd));
         if status.success() {
             Some(())
         } else {

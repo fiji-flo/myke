@@ -15,7 +15,7 @@ pub fn template_file<T: Iterator<Item=(String, String)>>(file: &Path, map: T)
     let tmpl = liquid::parse_file(file, Default::default()).unwrap();
     let mut ctx = Context::new();
     for (k, v) in map {
-        ctx.set_val(k.as_str(), Value::Str(v));
+        ctx.set_val(&k, Value::Str(v));
     }
     template(&tmpl, ctx)
 }
@@ -25,10 +25,10 @@ pub fn template_str(string: &str, env: &HashMap<String, String>, params: &HashMa
     let tmpl = liquid::parse(string, Default::default()).unwrap();
     let mut ctx = Context::new();
     for (k, v) in env {
-        ctx.set_val(k.as_str(), Value::Str(v.clone()));
+        ctx.set_val(&k, Value::Str(v.clone()));
     }
     for (k, v) in params {
-        ctx.set_val(k.as_str(), Value::Str(v.clone()));
+        ctx.set_val(&k, Value::Str(v.clone()));
     }
     template(&tmpl, ctx)
 }

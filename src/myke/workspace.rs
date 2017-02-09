@@ -26,7 +26,7 @@ impl Workspace {
         }
         if let Ok(p) = Project::from(&src) {
             for include in &p.discover {
-                Workspace::traverse(p.cwd.as_str(), Some(include.as_str()), projects)
+                Workspace::traverse(&p.cwd, Some(include), projects)
             }
             projects.push(p);
         }

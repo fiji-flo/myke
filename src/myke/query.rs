@@ -31,7 +31,7 @@ impl Query {
 
         let param_re = Regex::new(r"--\(.+\)=\(.*\)").unwrap();
         for rparam in rparams {
-            if let Some(cap) = param_re.captures(rparam.as_str()) {
+            if let Some(cap) = param_re.captures(rparam) {
                 if let (Some(k), Some(v)) = (cap.get(1), cap.get(2)) {
                     params.insert(String::from(k.as_str()), String::from(v.as_str()));
                 }
@@ -64,16 +64,16 @@ impl Query {
 
     fn matches_<'a>(&self, p: &'a Project, t: &'a Task) -> Option<(&'a Project, &'a Task)> {
         for tag in &self.tags {
-            let pattern = Pattern::new(tag.as_str()).unwrap();
-            let mut hit = pattern.matches(p.name.as_str());
+            let pattern = Pattern::new(tag).unwrap();
+            let mut hit = pattern.matches(&p.name);
             for t in &p.tags {
-                hit = hit || pattern.matches(t.as_str());
+                hit = hit || pattern.matches(t);
             }
             if !hit {
                 return None;
             }
         }
-        if Pattern::new(self.task.as_str()).unwrap().matches(t.name.as_str()) {
+        if Pattern::new(&self.task).unwrap().matches(&t.name) {
             return Some((p ,t));
         }
         None

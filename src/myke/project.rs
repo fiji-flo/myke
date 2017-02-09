@@ -31,7 +31,7 @@ impl Project {
         let mut file = try!(File::open(&src));
         let mut yml_str = String::new();
         try!(file.read_to_string(&mut yml_str));
-        let docs = YamlLoader::load_from_str(yml_str.as_str()).unwrap();
+        let docs = YamlLoader::load_from_str(&yml_str).unwrap();
         let doc = &docs[0];
         let mut p = Project{
             src: src,
