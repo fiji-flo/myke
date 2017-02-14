@@ -5,7 +5,7 @@ use myke::utils;
 use myke::template;
 use myke::workspace::Workspace;
 use std::env::current_exe;
-use std::process::Command;
+use std::process::{Command, ExitStatus};
 use std::string::String;
 use std::thread::sleep;
 use std::time::Instant;
@@ -57,7 +57,8 @@ impl <'a>Execution<'a> {
 
     #[cfg(windows)]
     fn shell() -> Command {
-        let mut cmd = Command::new("cmd.exe");
+        let cmd_exe = env::var_os("ComSpec").unwrap_or(r"C:\Windows\system32\cmd.exe");
+        let mut cmd = Command::new(cmd_exe);
         cmd.arg("/c");
         cmd
     }
@@ -91,15 +92,16 @@ impl <'a>Execution<'a> {
                 command.env(k, v);
             }
         }
-        let status = command
+        command
             .env("myke", current_exe().unwrap().to_str().unwrap())
             .env("MYKE_PROJECT", &self.project.name)
             .env("MYKE_TASK", &self.task.name)
             .env("MYKE_CWD", &self.project.cwd)
             .arg(cmd)
-            .current_dir(&self.project.cwd)
-            .status()
-            .expect(format!("failed to execute {}", self.task.cmd));
+            .current_dir(&self.project.cwd);
+        let status = run(&mut command, &format!("failed to execute {}", self.task.cmd));
+        //let status = command.status()
+        //    .expect(&format!("failed to execute {}", self.task.cmd));
         if status.success() {
             Some(())
         } else {
@@ -107,6 +109,18 @@ impl <'a>Execution<'a> {
         }
     }
 }
+#[cfg(not(test))]
+fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
+    command.status().expect(error_msg)
+}
+
+#[cfg(test)]
+fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
+    let output = command.output().expect(error_msg);
+    print!("{}", String::from_utf8_lossy(&output.stdout));
+    output.status
+}
+
 
 pub fn execute(w: &Workspace, q: &Query, dry_run: bool) -> Result<(), String> {
     let matches = q.search(w);
