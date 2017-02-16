@@ -57,7 +57,7 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
                 return HashMap::from_iter(env_vec);
             },
             Err(e) => {
-                println!("Error reading {}: {}", &path, e);
+                out!("Error reading {}: {}", &path, e);
             }
         }
     }

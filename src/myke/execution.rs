@@ -23,13 +23,13 @@ impl <'a>Execution<'a> {
         let status = self.retry();
         let took = now.elapsed();
         match status {
-            Some(_) => println!("{}/{}: Completed, Took: {}.{:>0w$}s",
+            Some(_) => out!("{}/{}: Completed, Took: {}.{:>0w$}s",
                                 self.project.name,
                                 self.task.name,
                                 took.as_secs(),
                                 took.subsec_nanos() / 1000,
                                 w=6),
-            _ => println!("{}/{} Failed, Took: {},{:>0w$}s",
+            _ => out!("{}/{} Failed, Took: {},{:>0w$}s",
                           self.project.name,
                           self.task.name,
                           took.as_secs(),
@@ -117,7 +117,7 @@ fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
 #[cfg(test)]
 fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
     let output = command.output().expect(error_msg);
-    print!("{}", String::from_utf8_lossy(&output.stdout));
+    out!("{}", String::from_utf8_lossy(&output.stdout));
     output.status
 }
 

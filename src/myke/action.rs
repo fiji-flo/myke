@@ -42,8 +42,8 @@ pub fn action(mut param_groups: utils::ParamGroups) {
     let a = parse(param_groups.pop_front().unwrap());
 
     match a {
-        Action::Help => println!("{}", USAGE),
-        Action::Version => println!("{}", VERSION),
+        Action::Help => out!("{}", USAGE),
+        Action::Version => out!("{}", VERSION),
         Action::DryRun(file) => run(file, param_groups, true),
         Action::Run(file) => run(file, param_groups, false),
         Action::Template(file) => template(file),
@@ -54,13 +54,13 @@ pub fn action(mut param_groups: utils::ParamGroups) {
 fn template(path: String) {
     let p = Path::new(&path);
     match template::template_file(&p , env::vars()) {
-        Ok(s) => println!("{}", s),
+        Ok(s) => out!("{}", s),
         Err(TemplateError::Required) => {
-            println!("[TEMPLATE_ERROR] missing required argument");
+            out!("[TEMPLATE_ERROR] missing required argument");
             process::exit(1);
         },
         Err(TemplateError::Unknown) =>  {
-            println!("[TEMPLATE_ERROR]: unknown error :/");
+            out!("[TEMPLATE_ERROR]: unknown error :/");
             process::exit(1);
         },
     };
@@ -74,7 +74,7 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool) {
     }
     for query in queries {
         if let Err(e) = execution::execute(&workspace, &query, dry_run) {
-            println!("[EXECUTION_ERROR]: {}", e);
+            out!("[EXECUTION_ERROR]: {}", e);
             process::exit(1);
         }
     }
