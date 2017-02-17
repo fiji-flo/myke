@@ -3,15 +3,6 @@ name = "myke"
 version = "0.1.0"
 authors = ["Florian Merz <flomerz@gmail.com>"]
 
-[lib]
-name = "myke"
-path = "src/lib.rs"
-
-[[bin]]
-name = "myke"
-path = "src/main.rs"
-doc = false
-
 [dependencies]
 yaml-rust = "*"
 itertools = "0.5.9"
@@ -20,3 +11,6 @@ prettytable-rs = "^0.6"
 regex = "0.2"
 glob = "0.2.11"
 liquid = "0.9"
+
+[dependencies.capture]
+path = "capture"

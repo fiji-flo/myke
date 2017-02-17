@@ -1,7 +1,7 @@
-extern crate myke;
-mod common;
-use common::TestTable;
-use myke::myke::utils;
+use myke::testing::TestTable;
+use myke::utils;
+#[cfg(test)]
+use myke::testing;
 
 #[test]
 fn working() {
@@ -17,5 +17,5 @@ fn help() {
         args: "myke --help",
         expected: ""
     };
-    common::run_cli_test("examples", &vec!(&tt));
+    testing::run_cli_test("examples", &vec!(&tt));
 }

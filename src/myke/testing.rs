@@ -1,15 +1,16 @@
-extern crate myke;
-
 use std::env;
 use std::path::Path;
+use myke::action;
+use myke::utils;
 
-
+#[cfg(test)]
 pub struct TestTable<'a> {
     pub desc: &'a str,
     pub args: &'a str,
     pub expected: &'a str,
 }
 
+#[cfg(test)]
 pub fn run_cli_test<'a>(dir: &str, tests: &[&'a TestTable]) {
     for test in tests {
         chdir(dir, &|| {
@@ -18,6 +19,7 @@ pub fn run_cli_test<'a>(dir: &str, tests: &[&'a TestTable]) {
     }
 }
 
+#[cfg(test)]
 fn chdir(dir: &str, f: &Fn()) {
     if let Ok(old_cwd) = env::current_dir() {
         let path = Path::new(dir);
@@ -28,8 +30,9 @@ fn chdir(dir: &str, f: &Fn()) {
     }
 }
 
+#[cfg(test)]
 fn run(args: &str) {
     let argv = args.split(" ").map(|s| {s.to_owned()}).collect();
-    let params_groups = myke::myke::utils::parse_param_groups(argv);
-    myke::myke::action::action(params_groups);
+    let params_groups = utils::parse_param_groups(argv);
+    action::action(params_groups);
 }
