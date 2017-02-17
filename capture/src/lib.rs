@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+use std::sync::mpsc::Sender;
 #[macro_export]
 macro_rules! capture {
     () => ($crate::out("\n"));
@@ -19,5 +21,15 @@ impl Out for Void {
 pub fn out(buf: String) {
     unsafe {
         (*OUT).out(buf);
+    }
+}
+
+pub struct Cappy {
+    pub tx: Mutex<Sender<String>>,
+}
+
+impl Out for Cappy {
+    fn out(&self, frag: String) {
+        let _ = self.tx.lock().unwrap().send(frag);
     }
 }
