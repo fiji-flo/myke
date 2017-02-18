@@ -18,7 +18,7 @@ pub struct TestTable<'a> {
 }
 
 #[cfg(test)]
-pub fn run_cli_test<'a>(dir: &str, tests: &[&'a TestTable]) {
+pub fn run_cli_test<'a>(dir: &str, tests: &[TestTable]) {
     let buf = Mutex::new(vec!());
     let cappy = Box::new(Cappy {
         buf: buf
@@ -51,4 +51,37 @@ fn run(args: &str) {
     let argv = args.split(" ").map(|s| {s.to_owned()}).collect();
     let params_groups = utils::parse_param_groups(argv);
     action::action(params_groups);
+}
+
+#[cfg(test)]
+#[macro_export]
+macro_rules! myke_test_file {
+    () => {
+        #[cfg(test)]
+        use myke::testing;
+    }
+}
+
+#[cfg(test)]
+#[macro_export]
+macro_rules! myke_test {
+    (
+        name $name:ident;
+        cd $dir:expr;
+        $(
+            $cmd:expr => $should:expr;
+        )*
+    ) => {
+        #[test]
+        fn $name() {
+            let tt = vec!(
+                $(testing::TestTable{
+                    desc: "",
+                    args: $cmd,
+                    expected: $should
+                },)*
+            );
+            testing::run_cli_test($dir, &tt);
+        }
+    }
 }

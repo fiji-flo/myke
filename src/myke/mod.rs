@@ -9,6 +9,7 @@ pub mod workspace;
 pub mod execution;
 pub mod action;
 #[cfg(test)]
+#[macro_use]
 pub mod testing;
 #[cfg(test)]
 mod tests;
