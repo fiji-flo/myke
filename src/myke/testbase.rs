@@ -14,7 +14,7 @@ fn working() {
 fn help() {
     let tt = TestTable{
         desc: "",
-        args: "myke --help",
+        args: "myke",
         expected: ""
     };
     testing::run_cli_test("examples", &vec!(&tt));

@@ -1,5 +1,7 @@
+use std::mem;
 use std::sync::Mutex;
 use std::sync::mpsc::Sender;
+
 #[macro_export]
 macro_rules! capture {
     () => ($crate::out("\n"));
@@ -21,6 +23,18 @@ impl Out for Void {
 pub fn out(buf: String) {
     unsafe {
         (*OUT).out(buf);
+    }
+}
+
+pub fn set(cap: Box<Out>) {
+    unsafe {
+        OUT = mem::transmute(cap);
+    }
+}
+
+pub fn void() {
+    unsafe {
+        OUT = &Void;
     }
 }
 

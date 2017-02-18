@@ -1,7 +1,11 @@
 use std::env;
 use std::path::Path;
+use std::sync::Mutex;
+use std::sync::mpsc;
 use myke::action;
 use myke::utils;
+use capture;
+use capture::Cappy;
 
 #[cfg(test)]
 pub struct TestTable<'a> {
@@ -12,11 +16,20 @@ pub struct TestTable<'a> {
 
 #[cfg(test)]
 pub fn run_cli_test<'a>(dir: &str, tests: &[&'a TestTable]) {
+    let (tx, rx) = mpsc::channel();
+    let cappy = Box::new(Cappy {
+        tx: Mutex::new(tx)
+    });
+    capture::set(cappy);
     for test in tests {
         chdir(dir, &|| {
             run(&test.args);
+            for x in rx.try_iter() {
+                println!("{}", x);
+            }
         })
     }
+    capture::void();
 }
 
 #[cfg(test)]
