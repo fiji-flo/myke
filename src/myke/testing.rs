@@ -29,7 +29,7 @@ pub fn run_cli_test<'a>(dir: &str, tests: &[TestTable]) {
             run(&test.args);
             let out = capture::dump().unwrap_or("".to_owned());
             let re = Regex::new(test.expected).unwrap();
-            assert!(re.is_match(&out));
+            assert!(re.is_match(&out), "\nexpected:\n{}\n\ngot:\n{}", test.expected, out);
         })
     }
     capture::void();

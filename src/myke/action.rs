@@ -91,7 +91,19 @@ pub fn list(workspace: &Workspace) {
         }
     }
     table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+    print_list(&table);
+}
+
+#[cfg(not(test))]
+fn print_list(table: &Table) {
     table.printstd();
+}
+
+#[cfg(test)]
+fn print_list(table: &Table) {
+    let mut buf = Vec::new();
+    assert!(table.print(&mut buf).is_ok());
+    out!("{}", String::from_utf8(buf).unwrap());
 }
 
 fn parse(options: VecDeque<String>) -> Action {

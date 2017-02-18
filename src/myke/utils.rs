@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
-use std::ffi::OsString;
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
@@ -73,10 +72,10 @@ pub fn merge_vec<T: Eq + Clone>(target: &mut Vec<T>, from: &Vec<T>) {
 }
 
 pub fn prepend_path(path: &str, update: &str) -> String {
-    let mut paths = env::split_paths(&path).collect::<Vec<_>>();
-    let update_paths = env::split_paths(&update).collect::<Vec<_>>();
-    paths.extend(update_paths);
-    match env::join_paths(paths) {
+    let paths = env::split_paths(&path).collect::<Vec<_>>();
+    let mut update_paths = env::split_paths(&update).collect::<Vec<_>>();
+    update_paths.extend(paths);
+    match env::join_paths(update_paths) {
         Ok(s) => s.into_string().unwrap_or(path.to_owned()),
         _ => path.to_owned()
     }
@@ -112,13 +111,13 @@ pub fn get_cwd(path: &PathBuf) -> String {
     cwd
 }
 
-pub fn add_to_path(update: &String) -> OsString {
+pub fn add_to_path(update: &String) -> String {
     if let Some(path) = env::var_os("PATH") {
-        let mut paths = env::split_paths(&path).collect::<Vec<_>>();
-        paths.push(PathBuf::from(update));
-        let new_path = env::join_paths(paths).unwrap();
-        return new_path.to_owned();
+        match path.to_str() {
+            Some(p) => prepend_path(p, update),
+            None => update.clone()
+        }
     } else {
-        return OsString::from(update);
+        update.clone()
     }
 }
