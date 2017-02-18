@@ -6,6 +6,7 @@ use myke::utils;
 use myke::template;
 use myke::template::TemplateError;
 use myke::workspace::Workspace;
+use prettytable::format;
 use prettytable::Table;
 use std::collections::VecDeque;
 use std::env;
@@ -83,11 +84,13 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool) {
 
 pub fn list(workspace: &Workspace) {
     let mut table = Table::new();
-    table.add_row(row![bc->"PROJECT", bc->"TAGS", bc->"TASKS"]);
+    table.set_titles(row![bc->"PROJECT", bc->"TAGS", bc->"TASKS"]);
     for p in &workspace.projects {
-        let (name, tags, tasks) = p.get_columns();
-        table.add_row(row![name, tags, tasks]);
+        if let Some((name, tags, tasks)) = p.get_columns() {
+            table.add_row(row![name, tags, tasks]);
+        }
     }
+    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
     table.printstd();
 }
 

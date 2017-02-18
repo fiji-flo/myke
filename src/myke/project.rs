@@ -62,10 +62,13 @@ impl Project {
         }
     }
 
-    pub fn get_columns(&self) -> (String, String, String) {
-        (self.name.clone(),
-         self.tags.join(","),
-         itertools::join(self.tasks.keys(), ","))
+    pub fn get_columns(&self) -> Option<(String, String, String)> {
+        if self.tasks.is_empty() {
+            return None;
+        }
+        Some((self.name.clone(),
+              itertools::join(itertools::sorted(&self.tags), ","),
+              itertools::join(itertools::sorted(self.tasks.keys()), ",")))
     }
 }
 
