@@ -1,23 +1,26 @@
+extern crate itertools;
+
 use std::mem;
 use std::sync::Mutex;
-use std::sync::mpsc::Sender;
 
 #[macro_export]
 macro_rules! capture {
-    () => ($crate::out("\n"));
-    ($fmt:expr) => ($crate::out(format!(concat!($fmt, "\n"))));
-    ($fmt:expr, $($arg:tt)*) => ($crate::out(format!(concat!($fmt, "\n"), $($arg)*)));
+    () => ($crate::out(""));
+    ($fmt:expr) => ($crate::out(format!($fmt)));
+    ($fmt:expr, $($arg:tt)*) => ($crate::out(format!($fmt, $($arg)*)));
 }
 static mut OUT: *const Out = &Void;
 
 pub trait Out: Sync+Send {
     fn out(&self, buf: String);
+    fn dump(&self) -> Option<String>;
 }
 
 struct Void;
 
 impl Out for Void {
     fn out(&self, _: String) {}
+    fn dump(&self) -> Option<String> { None }
 }
 
 pub fn out(buf: String) {
@@ -32,6 +35,12 @@ pub fn set(cap: Box<Out>) {
     }
 }
 
+pub fn dump() -> Option<String> {
+    unsafe {
+        (*OUT).dump()
+    }
+}
+
 pub fn void() {
     unsafe {
         OUT = &Void;
@@ -39,11 +48,17 @@ pub fn void() {
 }
 
 pub struct Cappy {
-    pub tx: Mutex<Sender<String>>,
+    pub buf: Mutex<Vec<String>>,
 }
 
 impl Out for Cappy {
     fn out(&self, frag: String) {
-        let _ = self.tx.lock().unwrap().send(frag);
+        let _ = self.buf.lock().unwrap().push(frag);
+    }
+    fn dump(&self) -> Option<String> {
+        match self.buf.lock() {
+            Ok(mut b) => Some(itertools::join(b.drain(0..), "")),
+            Err(_) => None
+        }
     }
 }

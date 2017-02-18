@@ -1,7 +1,10 @@
+extern crate itertools;
+extern crate regex;
+
 use std::env;
 use std::path::Path;
 use std::sync::Mutex;
-use std::sync::mpsc;
+use self::regex::Regex;
 use myke::action;
 use myke::utils;
 use capture;
@@ -16,17 +19,17 @@ pub struct TestTable<'a> {
 
 #[cfg(test)]
 pub fn run_cli_test<'a>(dir: &str, tests: &[&'a TestTable]) {
-    let (tx, rx) = mpsc::channel();
+    let buf = Mutex::new(vec!());
     let cappy = Box::new(Cappy {
-        tx: Mutex::new(tx)
+        buf: buf
     });
     capture::set(cappy);
     for test in tests {
         chdir(dir, &|| {
             run(&test.args);
-            for x in rx.try_iter() {
-                println!("{}", x);
-            }
+            let out = capture::dump().unwrap_or("".to_owned());
+            let re = Regex::new(test.expected).unwrap();
+            assert!(re.is_match(&out));
         })
     }
     capture::void();

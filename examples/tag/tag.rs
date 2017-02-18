@@ -11,11 +11,21 @@ fn working() {
 }
 
 #[test]
-fn help() {
+fn tag_a() {
     let tt = TestTable{
         desc: "",
-        args: "myke",
-        expected: ""
+        args: "myke tagA/tag",
+        expected: r"tags1 tag\n.*"
+    };
+    testing::run_cli_test("examples", &vec!(&tt));
+}
+
+#[test]
+fn tag_c() {
+    let tt = TestTable{
+        desc: "",
+        args: "myke tagC/tag",
+        expected: r"tags2 tag\n.*"
     };
     testing::run_cli_test("examples", &vec!(&tt));
 }

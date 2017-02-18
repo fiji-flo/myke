@@ -163,3 +163,4 @@ vendor/
 tmp/
 bin/myke*
 target
+src/myke/tests/*.rs

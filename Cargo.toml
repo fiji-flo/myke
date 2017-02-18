@@ -2,6 +2,7 @@
 name = "myke"
 version = "0.1.0"
 authors = ["Florian Merz <flomerz@gmail.com>"]
+build = "build.rs"
 
 [dependencies]
 yaml-rust = "*"
@@ -14,3 +15,6 @@ liquid = "0.9"
 
 [dependencies.capture]
 path = "capture"
+
+[build-dependencies]
+glob = "0.2.11"
