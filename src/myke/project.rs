@@ -47,6 +47,7 @@ impl Project {
         };
         add_env_file(&p.src, &mut p.env_files);
         load_env(&p.env_files, &mut p.env);
+        update_path(&p.cwd, &mut p.env);
         p.mixin();
         Ok(p)
     }
@@ -128,4 +129,10 @@ fn get_file_path(path: &PathBuf) -> String {
         String::from(path.join("myke.yml").to_str().unwrap())
     };
     src
+}
+
+fn update_path(cwd: &str, mut env: &mut HashMap<String,String>) {
+    if let Some(path) = env.get_mut("PATH") {
+        *path = load_path(cwd, &path);
+    }
 }

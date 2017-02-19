@@ -6,7 +6,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::iter::FromIterator;
 use std::iter::Iterator;
-use std::path::PathBuf;
+use std::path::{Path,PathBuf};
 
 pub type ParamGroups = VecDeque<VecDeque<String>>;
 
@@ -14,6 +14,21 @@ pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
     let mut env = String::from(src.clone().trim_right_matches(".yml"));
     env.push_str(".env");
     env_files.push(env);
+}
+
+pub fn load_path(cwd: &str, path: &str) -> String {
+    let mut paths = env::split_paths(path)
+        .map(|p| {
+            if !p.has_root() {
+                return Path::new(cwd).join(p);
+            }
+            p
+        }).collect::<Vec<_>>();
+    paths.push(Path::new(cwd).join("bin"));
+    match env::join_paths(paths) {
+        Ok(s) => s.into_string().unwrap_or(path.to_owned()),
+        _ => path.to_owned()
+    }
 }
 
 pub fn load_env(env_files: &Vec<String>,mut env: &mut HashMap<String, String>) {
@@ -114,7 +129,7 @@ pub fn get_cwd(path: &PathBuf) -> String {
 pub fn add_to_path(update: &String) -> String {
     if let Some(path) = env::var_os("PATH") {
         match path.to_str() {
-            Some(p) => prepend_path(p, update),
+            Some(p) => prepend_path(update, p),
             None => update.clone()
         }
     } else {

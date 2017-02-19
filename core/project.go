@@ -98,7 +98,7 @@ func loadProjectJSON(json gjson.Result) Project {
 		for k, v := range j.Map() {
 			p.Env[k] = v.String()
 		}
-	}
+ bb bb	}
 	if j := json.Get("env_files"); j.Exists() {
 		for _, s := range j.Array() {
 			p.EnvFiles = append(p.EnvFiles, s.String())

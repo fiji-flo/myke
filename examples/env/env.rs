@@ -9,6 +9,6 @@ myke_test!(
 	  "myke file_default_local" => r"envvar from myke.env.local is value_from_myke.env.local";
 	  "myke file_custom" => r"envvar from test.env is value_from_test.env";
 	  "myke file_custom_local" => r"envvar from test.env.local is value_from_test.env.local";
-    // TODO: fix path handling in utils and project
-	  //"myke path" => r"PATH is [^:]+env/path_from_myke.env.local:[^:]+env/path_from_myke.env:[^:]+env/path_from_test.env.local:[^:]+env/path_from_test.env:[^:]+env/path_from_yml:[^:]+env/bin";
+    // myke-rs expandes PATH elements
+	  "myke path" => r"PATH is [^:]+.*/env/path_from_myke.env.local:[^:]+.*/env/path_from_myke.env:[^:]+.*/env/path_from_test.env.local:[^:]+.*/env/path_from_test.env:[^:]+.*/env/path_from_yml:[^:]+.*/env/bin";
 );
