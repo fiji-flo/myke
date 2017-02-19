@@ -29,7 +29,7 @@ impl Query {
 
         let mut params = HashMap::new();
 
-        let param_re = Regex::new(r"--\(.+\)=\(.*\)").unwrap();
+        let param_re = Regex::new("--(.+)=(.*)").unwrap();
         for rparam in rparams {
             if let Some(cap) = param_re.captures(rparam) {
                 if let (Some(k), Some(v)) = (cap.get(1), cap.get(2)) {

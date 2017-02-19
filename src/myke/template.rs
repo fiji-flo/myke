@@ -43,6 +43,16 @@ pub fn template(tmpl: &Template, mut ctx: Context)
         }
         Ok(input.clone())
     }));
+    ctx.add_filter("default", Box::new(|input, args| {
+        if let &Value::Str(ref s) = input {
+            if s.len() == 0 {
+                if let Some(&Value::Str(ref d)) = args.get(0) {
+                    return Ok(Value::Str(d.clone()));
+                }
+            }
+        }
+        Ok(input.clone())
+    }));
 
     match tmpl.render(&mut ctx) {
         Ok(Some(s)) => Ok(s),

@@ -12,7 +12,8 @@ impl Workspace {
     pub fn parse(path: &str) -> Workspace {
         let mut projects = Vec::new();
         let cwd = utils::get_cwd(&PathBuf::from(path));
-        Workspace::traverse(&cwd, None, &mut projects);
+        let src = utils::get_file_path(&PathBuf::from(path));
+        Workspace::traverse(&src.unwrap_or(cwd.clone()), None, &mut projects);
         Workspace{
             cwd: cwd,
             projects: projects,
