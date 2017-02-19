@@ -7,6 +7,7 @@ use std::io::prelude::*;
 use std::iter::FromIterator;
 use std::iter::Iterator;
 use std::path::{Path,PathBuf};
+use std::time::Duration;
 
 pub type ParamGroups = VecDeque<VecDeque<String>>;
 
@@ -141,4 +142,22 @@ pub fn add_to_path(update: &String) -> String {
     } else {
         update.clone()
     }
+}
+
+pub fn parse_duration(duration_str: &str) -> Duration {
+    if duration_str.ends_with("ms") {
+        let ms = match duration_str.trim_right_matches("ms").parse::<u64>() {
+            Ok(ms) => ms,
+            _ => 1000
+        };
+        return Duration::from_millis(ms);
+    }
+    if duration_str.ends_with("ms") {
+        let s = match duration_str.trim_right_matches("s").parse::<u64>() {
+            Ok(s) => s,
+            _ => 1
+        };
+        return Duration::from_secs(s);
+    }
+    return Duration::from_secs(1);
 }

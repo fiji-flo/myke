@@ -15,6 +15,7 @@ struct Execution<'a> {
     project: &'a Project,
     task: &'a Task,
     dry_run: bool,
+    verbose: bool,
 }
 
 impl <'a>Execution<'a> {
@@ -29,7 +30,7 @@ impl <'a>Execution<'a> {
                             took.as_secs(),
                             took.subsec_nanos() / 1000,
                             w=6),
-            _ => out!("{}/{} Failed, Took: {},{:>0w$}s",
+            _ => out!("{}/{}: Failed, Took: {},{:>0w$}s",
                       self.project.name,
                       self.task.name,
                       took.as_secs(),
@@ -40,11 +41,19 @@ impl <'a>Execution<'a> {
     }
 
     fn retry(&'a self) -> Option<()> {
-        for _ in 0..(self.task.retry + 1) {
+        for i in 0..(self.task.retry + 1) {
             if let Some(_) = self.execute_task() {
                 return Some(());
             }
-            sleep(self.task.retry_delay);
+            sleep(self.task.retry_delay.0);
+            if i < self.task.retry && self.verbose {
+                out!("{}/{}: Failed, Retrying {}/{} in {}ms",
+                     self.project.name,
+                     self.task.name,
+                     i + 1,
+                     self.task.retry,
+                     self.task.retry_delay.1);
+            }
         }
         None
     }
@@ -126,7 +135,7 @@ fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
 }
 
 
-pub fn execute(w: &Workspace, q: &Query, dry_run: bool) -> Result<(), String> {
+pub fn execute(w: &Workspace, q: &Query, dry_run: bool, verbose: bool) -> Result<(), String> {
     let matches = q.search(w);
     if matches.is_empty() {
         return Err(format!("no task matched {}", q.task));
@@ -137,6 +146,7 @@ pub fn execute(w: &Workspace, q: &Query, dry_run: bool) -> Result<(), String> {
             project: &p,
             task: &t,
             dry_run: dry_run,
+            verbose: verbose,
         };
         if let None = e.execute() {
             return Err(String::from("DOOM"));

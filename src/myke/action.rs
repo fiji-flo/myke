@@ -23,6 +23,7 @@ myke options:
   --version   print myke version
   --template= template file to render
   --license   show open source licenses
+  --verbose   show slightly more output
 
 Help Options:
   --help      Show this help message
@@ -33,6 +34,7 @@ Help Options:
 enum Action {
     Run(String),
     DryRun(String),
+    VerboseRun(String),
     Help,
     Version,
     Licenses,
@@ -45,8 +47,9 @@ pub fn action(mut param_groups: utils::ParamGroups) {
     match a {
         Action::Help => out!("{}", USAGE),
         Action::Version => out!("{}", VERSION),
-        Action::DryRun(file) => run(file, param_groups, true),
-        Action::Run(file) => run(file, param_groups, false),
+        Action::DryRun(file) => run(file, param_groups, true, false),
+        Action::VerboseRun(file) => run(file, param_groups, false, true),
+        Action::Run(file) => run(file, param_groups, false, false),
         Action::Template(file) => template(file),
         _ => {}
     }
@@ -67,14 +70,14 @@ fn template(path: String) {
     };
 }
 
-fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool) {
+fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool, verbose: bool) {
     let workspace = Workspace::parse(&path);
     let queries = query::parse_queries(&mut param_groups);
     if queries.is_empty() {
         list(&workspace);
     }
     for query in queries {
-        if let Err(e) = execution::execute(&workspace, &query, dry_run) {
+        if let Err(e) = execution::execute(&workspace, &query, dry_run, verbose) {
             out!("[EXECUTION_ERROR]: {}", e);
             process::exit(1);
         }
@@ -124,6 +127,9 @@ fn parse(options: VecDeque<String>) -> Action {
 
     if options.has("--dry-run") || options.has("-n") {
         return Action::DryRun(file);
+    }
+    if options.has("--verbose") || options.has("-n") {
+        return Action::VerboseRun(file);
     }
     Action::Run(file)
 }

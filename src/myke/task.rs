@@ -2,6 +2,7 @@ extern crate humantime;
 extern crate yaml_rust;
 
 use std::time::Duration;
+use myke::utils::parse_duration;
 use self::yaml_rust::Yaml;
 
 #[derive(Clone)]
@@ -13,11 +14,12 @@ pub struct Task {
     pub after: Option<String>,
     pub shell: Option<String>,
     pub retry: u32,
-    pub retry_delay: Duration,
+    pub retry_delay: (Duration, String),
 }
 
 impl Task {
     pub fn parse(name: String, yaml: &Yaml) -> Task {
+        let dur = val!(yaml, "retry_delay", "1s");
         Task{
             name: name,
             desc: val_opt!(yaml, "desc"),
@@ -25,8 +27,8 @@ impl Task {
             before: val_opt!(yaml, "before"),
             after: val_opt!(yaml, "after"),
             shell: val_opt!(yaml, "shell"),
-            retry: 0,
-            retry_delay: Duration::from_secs(0)
+            retry: yaml["retry"].as_i64().unwrap_or(0) as u32,
+            retry_delay: (parse_duration(&dur), dur),
         }
     }
 
