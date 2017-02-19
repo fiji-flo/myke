@@ -15,13 +15,14 @@ import (
 
 // TestTable represents a table-driven test
 type TestTable struct {
-	Desc     string
-	Args     string
-	Expected string
+	Arg string
+	Out string
+	Err bool
 }
 
 // RunCliTests runs myke CLI with the given table tests
 func RunCliTests(t *testing.T, dir string, tests []TestTable) {
+	os.Setenv("COLUMNS", "999")
 	captureChdir(dir, func() {
 		for _, tt := range tests {
 			runTest(t, tt)
@@ -31,15 +32,14 @@ func RunCliTests(t *testing.T, dir string, tests []TestTable) {
 
 func runTest(t *testing.T, tt TestTable) {
 	actual, err := captureStdout(func() error {
-		args := strings.Split(strings.TrimSpace("myke "+tt.Args), " ")
-		return cmd.NewApp().Run(args)
+		args := strings.Split(tt.Arg, " ")
+		return cmd.Exec(args)
 	})
 
-	// TODO: Add error verification
-	if assert.Regexp(t, tt.Expected, actual) {
-		t.Logf("myke(%s): passed", tt.Desc)
+	if tt.Err == (err != nil) && assert.Regexp(t, tt.Out, actual) {
+		t.Logf("myke(%s): passed", tt.Arg)
 	} else {
-		t.Errorf("myke(%s): failed %s", tt.Desc, err)
+		t.Errorf("myke(%s): failed %s", tt.Arg, err)
 	}
 }
 
