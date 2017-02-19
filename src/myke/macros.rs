@@ -4,6 +4,21 @@ macro_rules! val {
         (String::from($yml[$yml_key].as_str().unwrap_or($default)))
 }
 
+#[macro_export]
+macro_rules! val_opt {
+    ($yml:ident, $yml_key:expr) =>
+        ($yml[$yml_key].as_str().and_then(|s| {Some(s.to_owned())}))
+}
+
+#[macro_export]
+macro_rules! update_task {
+    ($self_:ident $update:ident $field:ident) => {
+        if $self_.$field.is_none() {
+            $self_.$field = $update.$field.clone();
+        }
+    }
+}
+
 #[cfg(not(test))]
 #[macro_export]
 macro_rules! out {

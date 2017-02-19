@@ -40,7 +40,7 @@ impl Project {
             desc: val!(doc, "desc", ""),
             tags: extract_string_vec(&doc["tags"]),
             discover: extract_string_vec(&doc["discover"]),
-            mixin: extract_string_vec(&doc["mixins"]),
+            mixin: extract_string_vec(&doc["mixin"]),
             env: extract_string_map(&doc["env"]),
             env_files: extract_string_vec(&doc["env_files"]),
             tasks: extract_task_map(&doc["tasks"])
@@ -55,10 +55,11 @@ impl Project {
     fn mixin(&mut self) {
         for path in &self.mixin {
             if let Ok(p) = Project::from(&PathBuf::from(path)) {
+                update_tasks(&mut self.tasks, &p.tasks);
                 merge_vec(&mut self.tags, &p.tags);
                 merge_vec(&mut self.discover, &p.discover);
                 merge_vec(&mut self.env_files, &p.env_files);
-                merge_env(&mut self.env, &p.env);
+                merge_env(&mut self.env, &p.env, false);
             }
         }
     }
@@ -135,4 +136,16 @@ fn update_path(cwd: &str, mut env: &mut HashMap<String,String>) {
     if let Some(path) = env.get_mut("PATH") {
         *path = load_path(cwd, &path);
     }
+}
+
+pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, Task>) {
+    for (k,v) in update {
+        if let Some(t) = base.get_mut(k) {
+            t.update(v);
+        }
+        if !base.contains_key(k) {
+            base.insert(k.clone(), v.clone());
+        }
+    }
+
 }

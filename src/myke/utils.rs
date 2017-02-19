@@ -33,22 +33,28 @@ pub fn load_path(cwd: &str, path: &str) -> String {
 
 pub fn load_env(env_files: &Vec<String>,mut env: &mut HashMap<String, String>) {
     for ref env_file in env_files {
-        merge_env(&mut env, &parse_env_file(env_file));
+        merge_env(&mut env, &parse_env_file(env_file), true);
         let mut local = String::from((*env_file).clone());
         local.push_str(".local");
-        merge_env(&mut env, &parse_env_file(&local));
+        merge_env(&mut env, &parse_env_file(&local), true);
     }
 }
 
-pub fn merge_env(env: &mut HashMap<String, String>, update: &HashMap<String, String>) {
+pub fn merge_env(env: &mut HashMap<String, String>, update: &HashMap<String, String>, over: bool) {
     for (k,v) in update {
         if k == "PATH" {
             let path = match env.get(k) {
-                Some(path) => prepend_path(path, v),
+                Some(path) => {
+                    if over {
+                        prepend_path(path, v)
+                    } else {
+                        prepend_path(v, path)
+                    }
+                },
                 None => v.clone()
             };
             env.insert(k.clone(), path);
-        } else {
+        } else if over || !env.contains_key(k) {
             env.insert(k.clone(), v.clone());
         }
     }

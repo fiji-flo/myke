@@ -24,17 +24,17 @@ impl <'a>Execution<'a> {
         let took = now.elapsed();
         match status {
             Some(_) => out!("{}/{}: Completed, Took: {}.{:>0w$}s",
-                                self.project.name,
-                                self.task.name,
-                                took.as_secs(),
-                                took.subsec_nanos() / 1000,
-                                w=6),
+                            self.project.name,
+                            self.task.name,
+                            took.as_secs(),
+                            took.subsec_nanos() / 1000,
+                            w=6),
             _ => out!("{}/{} Failed, Took: {},{:>0w$}s",
-                          self.project.name,
-                          self.task.name,
-                          took.as_secs(),
-                          took.subsec_nanos() / 1000,
-                          w=6),
+                      self.project.name,
+                      self.task.name,
+                      took.as_secs(),
+                      took.subsec_nanos() / 1000,
+                      w=6),
         }
         Some(())
     }
@@ -70,42 +70,46 @@ impl <'a>Execution<'a> {
         cmd
     }
 
-    fn execute_cmd(&'a self, cmd: &str) -> Option<()> {
-        if cmd == "" {
-            return Some(());
-        }
-        let mut cmd = match template::template_str(cmd, &self.project.env, &self.query.params) {
-            Ok(s) => s,
-            _ => String::from(cmd)
-        };
-        if self.task.shell != "" {
-            cmd = format!("{} {}", self.task.shell, cmd);
-        }
-        if self.dry_run {
-            cmd = format!("echo {}", cmd);
-        }
-        let mut command = Execution::shell();
-        for (k, v) in &self.project.env {
-            if k == "PATH" {
-                command.env(k, utils::add_to_path(v));
-            } else {
-                command.env(k, v);
+    fn execute_cmd(&'a self, cmd: &Option<String>) -> Option<()> {
+        if let &Some(ref cmd) = cmd {
+            if cmd == "" {
+                return Some(());
             }
-        }
-        command
-            .env("myke", current_exe().unwrap().to_str().unwrap())
-            .env("MYKE_PROJECT", &self.project.name)
-            .env("MYKE_TASK", &self.task.name)
-            .env("MYKE_CWD", &self.project.cwd)
-            .arg(cmd)
-            .current_dir(&self.project.cwd);
-        let status = run(&mut command, &format!("failed to execute {}", self.task.cmd));
-        //let status = command.status()
-        //    .expect(&format!("failed to execute {}", self.task.cmd));
-        if status.success() {
-            Some(())
+            let mut cmd = match template::template_str(&cmd, &self.project.env, &self.query.params) {
+                Ok(s) => s,
+                _ => cmd.clone()
+            };
+            if let Some(ref shell) = self.task.shell {
+                if shell != "" {
+                    cmd = format!("{} {}", shell, cmd);
+                }
+            }
+            if self.dry_run {
+                cmd = format!("echo {}", cmd);
+            }
+            let mut command = Execution::shell();
+            for (k, v) in &self.project.env {
+                if k == "PATH" {
+                    command.env(k, utils::add_to_path(v));
+                } else {
+                    command.env(k, v);
+                }
+            }
+            command
+                .env("myke", current_exe().unwrap().to_str().unwrap())
+                .env("MYKE_PROJECT", &self.project.name)
+                .env("MYKE_TASK", &self.task.name)
+                .env("MYKE_CWD", &self.project.cwd)
+                .arg(&cmd)
+                .current_dir(&self.project.cwd);
+            let status = run(&mut command, &format!("failed to execute {}", cmd));
+            if status.success() {
+                Some(())
+            } else {
+                None
+            }
         } else {
-            None
+            Some(())
         }
     }
 }
