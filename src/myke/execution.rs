@@ -45,6 +45,11 @@ impl <'a>Execution<'a> {
             if let Some(_) = self.execute_task() {
                 return Some(());
             }
+            if let Some(ref err) = self.task.error {
+                if err.len() > 0 {
+                    out!("{}", err);
+                }
+            }
             sleep(self.task.retry_delay.0);
             if i < self.task.retry && self.verbose {
                 out!("{}/{}: Failed, Retrying {}/{} in {}ms",

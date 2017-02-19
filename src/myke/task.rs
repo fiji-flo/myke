@@ -13,6 +13,7 @@ pub struct Task {
     pub before: Option<String>,
     pub after: Option<String>,
     pub shell: Option<String>,
+    pub error: Option<String>,
     pub retry: u32,
     pub retry_delay: (Duration, String),
 }
@@ -27,6 +28,7 @@ impl Task {
             before: val_opt!(yaml, "before"),
             after: val_opt!(yaml, "after"),
             shell: val_opt!(yaml, "shell"),
+            error: val_opt!(yaml, "error"),
             retry: yaml["retry"].as_i64().unwrap_or(0) as u32,
             retry_delay: (parse_duration(&dur), dur),
         }
@@ -39,6 +41,7 @@ impl Task {
             update_task!(self update before);
             update_task!(self update after);
             update_task!(self update shell);
+            update_task!(self update error);
         }
     }
 }
