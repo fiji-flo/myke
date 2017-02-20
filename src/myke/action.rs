@@ -87,11 +87,14 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool, verbos
 
 pub fn list(workspace: &Workspace) {
     let mut table = Table::new();
-    table.set_titles(row![bc->"PROJECT", bc->"TAGS", bc->"TASKS"]);
+    table.set_titles(row![b->"PROJECT", b->"TAGS", b->"TASKS"]);
     for p in &workspace.projects {
         if let Some((name, tags, tasks)) = p.get_columns() {
             table.add_row(row![name, tags, tasks]);
         }
+    }
+    if table.get_row(0).is_none() {
+        table.add_row(row!["", "", ""]);
     }
     table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
     print_list(&table);

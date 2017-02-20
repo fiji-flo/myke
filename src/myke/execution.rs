@@ -20,6 +20,9 @@ struct Execution<'a> {
 
 impl <'a>Execution<'a> {
     pub fn execute(&'a self) -> Option<()> {
+        if self.dry_run {
+            out!("{}/{}: Will run", self.project.name, self.task.name);
+        }
         let now = Instant::now();
         let status = self.retry();
         let took = now.elapsed();
@@ -97,9 +100,6 @@ impl <'a>Execution<'a> {
                 if shell != "" {
                     cmd = format!("{} {}", shell, cmd);
                 }
-            }
-            if self.dry_run {
-                cmd = format!("echo {}", cmd);
             }
             let mut command = Execution::shell();
             for (k, v) in &self.project.env {

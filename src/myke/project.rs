@@ -69,8 +69,8 @@ impl Project {
             return None;
         }
         Some((self.name.clone(),
-              itertools::join(itertools::sorted(&self.tags), ","),
-              itertools::join(itertools::sorted(self.tasks.keys()), ",")))
+              itertools::join(itertools::sorted(&self.tags), ", "),
+              itertools::join(itertools::sorted(self.tasks.keys()), ", ")))
     }
 }
 
