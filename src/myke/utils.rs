@@ -117,6 +117,7 @@ pub fn parse_param_groups(args: Vec<String>) -> ParamGroups {
     queries.push_back(current);
     queries
 }
+
 pub fn get_file_path(path: &PathBuf) -> Option<String> {
     let is_file = path.is_file();
     let full_path = match fs::canonicalize(path) {

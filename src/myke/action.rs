@@ -11,6 +11,7 @@ use prettytable::Table;
 use std::collections::VecDeque;
 use std::env;
 use std::path::Path;
+#[cfg(not(test))]
 use std::process;
 
 const VERSION: &'static str = "0.9";
@@ -61,10 +62,12 @@ fn template(path: String) {
         Ok(s) => out!("{}", s),
         Err(TemplateError::Required) => {
             out!("[TEMPLATE_ERROR] missing required argument");
+            #[cfg(not(test))]
             process::exit(1);
         },
         Err(TemplateError::Unknown) =>  {
             out!("[TEMPLATE_ERROR]: unknown error :/");
+            #[cfg(not(test))]
             process::exit(1);
         },
     };
@@ -78,7 +81,10 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool, verbos
     }
     for query in queries {
         if let Err(e) = execution::execute(&workspace, &query, dry_run, verbose) {
-            out!("[EXECUTION_ERROR]: {}", e);
+            if verbose {
+                out!("[EXECUTION_ERROR]: {}", e);
+            }
+            #[cfg(not(test))]
             process::exit(1);
         }
     }

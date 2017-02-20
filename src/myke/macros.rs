@@ -34,9 +34,9 @@ macro_rules! concat_task {
 #[cfg(not(test))]
 #[macro_export]
 macro_rules! out {
-    () => (print!("\n"));
-    ($fmt:expr) => (print!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
+    () => (println!());
+    ($fmt:expr) => (println!($fmt));
+    ($fmt:expr, $($arg:tt)*) => (println!($fmt, $($arg)*));
 }
 
 #[cfg(test)]

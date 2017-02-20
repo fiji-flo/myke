@@ -20,27 +20,22 @@ struct Execution<'a> {
 
 impl <'a>Execution<'a> {
     pub fn execute(&'a self) -> Option<()> {
+        let name = format!("{}/{}", self.project.name, self.task.name);
         if self.dry_run {
-            out!("{}/{}: Will run", self.project.name, self.task.name);
+            out!("{}: Will run", name);
         }
         let now = Instant::now();
         let status = self.retry();
         let took = now.elapsed();
+        let took = format!("{}.{:>0w$}s",
+                           took.as_secs(),
+                           took.subsec_nanos() / 1000,
+                           w=6);
         match status {
-            Some(_) => out!("{}/{}: Completed, Took: {}.{:>0w$}s",
-                            self.project.name,
-                            self.task.name,
-                            took.as_secs(),
-                            took.subsec_nanos() / 1000,
-                            w=6),
-            _ => out!("{}/{}: Failed, Took: {},{:>0w$}s",
-                      self.project.name,
-                      self.task.name,
-                      took.as_secs(),
-                      took.subsec_nanos() / 1000,
-                      w=6),
+            Some(_) => out!("{}: Completed, Took: {}", name, took),
+            _ => out!("{}: Failed, Took: {}", name, took),
         }
-        Some(())
+        status
     }
 
     fn retry(&'a self) -> Option<()> {
@@ -127,6 +122,7 @@ impl <'a>Execution<'a> {
         }
     }
 }
+
 #[cfg(not(test))]
 fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
     command.status().expect(error_msg)
@@ -138,7 +134,6 @@ fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
     out!("{}", String::from_utf8_lossy(&output.stdout));
     output.status
 }
-
 
 pub fn execute(w: &Workspace, q: &Query, dry_run: bool, verbose: bool) -> Result<(), String> {
     let matches = q.search(w);
@@ -154,7 +149,7 @@ pub fn execute(w: &Workspace, q: &Query, dry_run: bool, verbose: bool) -> Result
             verbose: verbose,
         };
         if let None = e.execute() {
-            return Err(String::from("DOOM"));
+            return Err(String::from("Something went wrong :/"));
         }
     }
     Ok(())
