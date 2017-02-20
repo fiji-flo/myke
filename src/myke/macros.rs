@@ -19,6 +19,18 @@ macro_rules! update_task {
     }
 }
 
+#[macro_export]
+macro_rules! concat_task {
+    ($self_:ident $update:ident $field:ident) => {
+        $self_.$field = match ($self_.$field.clone(), $update.$field.clone()) {
+            (Some(s), Some(u)) => Some(format!("{}\n{}", s, u)),
+            (Some(s), None) => Some(s),
+            (None, Some(u)) => Some(u),
+            _ => None
+        }
+    }
+}
+
 #[cfg(not(test))]
 #[macro_export]
 macro_rules! out {

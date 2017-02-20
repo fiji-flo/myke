@@ -54,7 +54,7 @@ impl Project {
 
     fn mixin(&mut self) {
         for path in &self.mixin {
-            if let Ok(p) = Project::from(&PathBuf::from(path)) {
+            if let Ok(p) = Project::from(&PathBuf::from(&self.cwd).join(path)) {
                 update_tasks(&mut self.tasks, &p.tasks);
                 merge_vec(&mut self.tags, &p.tags);
                 merge_vec(&mut self.discover, &p.discover);

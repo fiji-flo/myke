@@ -7,5 +7,6 @@ myke_test!(
     "myke task1" => "parent says value_parent_1";
     "myke task2" => "(?s)parent says value_child_2.*?child says value_child_2";
     "myke task3" => "child says value_child_3";
+    "myke task4" => "(?s)child says value_child_2.*?parent says value_parent_1.*?child says value_child_3";
     "myke path" => "PATH is [^:]+.*/mixin/path_child:[^:]+.*/mixin/bin:[^:]+.*/mixin/parent/path_parent:[^:]+.*/mixin/parent/bin";
 );

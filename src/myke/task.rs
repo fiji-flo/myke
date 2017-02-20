@@ -38,10 +38,10 @@ impl Task {
         if self.name == update.name {
             update_task!(self update desc);
             update_task!(self update cmd);
-            update_task!(self update before);
-            update_task!(self update after);
+            concat_task!(self update before);
+            concat_task!(self update after);
             update_task!(self update shell);
-            update_task!(self update error);
+            concat_task!(self update error);
         }
     }
 }
