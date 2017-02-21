@@ -1,3 +1,4 @@
+/* This is a collection of some helper functions that don't depend on myke of external crates. */
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
@@ -175,4 +176,10 @@ pub fn parse_duration(duration_str: &str) -> Duration {
         return Duration::from_secs(s);
     }
     return Duration::from_secs(1);
+}
+
+pub fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
+    if let Some(path) = env.get_mut("PATH") {
+        *path = load_path(cwd, &path);
+    }
 }

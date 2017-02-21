@@ -5,16 +5,16 @@ authors = ["Florian Merz <flomerz@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
-yaml-rust = "*"
-itertools = "0.5.9"
-humantime = "1.0.0"
+yaml-rust = "^0.3.5"
+itertools = "^0.5.9"
+humantime = "^1.0.0"
 prettytable-rs = "^0.6"
-regex = "0.2"
-glob = "0.2.11"
-liquid = "0.9"
+regex = "^0.2"
+glob = "^0.2.11"
+liquid = "^0.9"
 
 [dependencies.capture]
 path = "capture"
 
 [build-dependencies]
-glob = "0.2.11"
+glob = "^0.2.11"

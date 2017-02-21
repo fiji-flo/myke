@@ -84,6 +84,17 @@ impl fmt::Display for Project {
     }
 }
 
+fn get_file_path(path: &PathBuf) -> String {
+    let is_file = path.is_file();
+
+    let src = if is_file {
+        String::from(path.to_str().unwrap())
+    } else {
+        String::from(path.join("myke.yml").to_str().unwrap())
+    };
+    src
+}
+
 fn extract_string_vec(yml: &Yaml) -> Vec<String> {
     let yaml_vec = yml.as_vec();
     match yaml_vec {
@@ -127,23 +138,6 @@ fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
     }
 }
 
-
-fn get_file_path(path: &PathBuf) -> String {
-    let is_file = path.is_file();
-
-    let src = if is_file {
-        String::from(path.to_str().unwrap())
-    } else {
-        String::from(path.join("myke.yml").to_str().unwrap())
-    };
-    src
-}
-
-fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
-    if let Some(path) = env.get_mut("PATH") {
-        *path = load_path(cwd, &path);
-    }
-}
 
 pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, Task>) {
     for (k, v) in update {
