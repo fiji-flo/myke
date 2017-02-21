@@ -4,7 +4,7 @@ use myke::utils;
 use std::string::String;
 
 pub struct Workspace {
-    pub cwd:      String,
+    pub cwd: String,
     pub projects: Vec<Project>,
 }
 
@@ -14,7 +14,7 @@ impl Workspace {
         let cwd = utils::get_cwd(&PathBuf::from(path));
         let src = utils::get_file_path(&PathBuf::from(path));
         Workspace::traverse(&src.unwrap_or(cwd.clone()), None, &mut projects);
-        Workspace{
+        Workspace {
             cwd: cwd,
             projects: projects,
         }
@@ -23,7 +23,7 @@ impl Workspace {
     fn traverse(cwd: &str, path: Option<&str>, projects: &mut Vec<Project>) {
         let mut src = PathBuf::from(cwd);
         if let Some(path) = path {
-           src.push(path);
+            src.push(path);
         }
         if let Ok(p) = Project::from(&src) {
             for include in &p.discover {

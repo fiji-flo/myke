@@ -9,19 +9,19 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
-use self::yaml_rust::{Yaml,YamlLoader};
+use self::yaml_rust::{Yaml, YamlLoader};
 
 pub struct Project {
-    pub src:       String,
-    pub cwd:       String,
-    pub name:      String,
-    pub desc:      String,
-    pub tags:      Vec<String>,
-    pub discover:  Vec<String>,
-    pub mixin:     Vec<String>,
-    pub env:       HashMap<String, String>,
+    pub src: String,
+    pub cwd: String,
+    pub name: String,
+    pub desc: String,
+    pub tags: Vec<String>,
+    pub discover: Vec<String>,
+    pub mixin: Vec<String>,
+    pub env: HashMap<String, String>,
     pub env_files: Vec<String>,
-    pub tasks:     HashMap<String, Task>
+    pub tasks: HashMap<String, Task>,
 }
 
 impl Project {
@@ -33,7 +33,7 @@ impl Project {
         try!(file.read_to_string(&mut yml_str));
         let docs = YamlLoader::load_from_str(&yml_str).unwrap();
         let doc = &docs[0];
-        let mut p = Project{
+        let mut p = Project {
             src: src,
             cwd: cwd,
             name: val!(doc, "project", ""),
@@ -43,7 +43,7 @@ impl Project {
             mixin: extract_string_vec(&doc["mixin"]),
             env: extract_string_map(&doc["env"]),
             env_files: extract_string_vec(&doc["env_files"]),
-            tasks: extract_task_map(&doc["tasks"])
+            tasks: extract_task_map(&doc["tasks"]),
         };
         add_env_file(&p.src, &mut p.env_files);
         load_env(&p.env_files, &mut p.env);
@@ -76,7 +76,8 @@ impl Project {
 
 impl fmt::Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}\t{}\t{}",
+        write!(f,
+               "{}\t{}\t{}",
                self.name,
                self.tags.join(","),
                itertools::join(self.tasks.keys(), ","))
@@ -86,37 +87,43 @@ impl fmt::Display for Project {
 fn extract_string_vec(yml: &Yaml) -> Vec<String> {
     let yaml_vec = yml.as_vec();
     match yaml_vec {
-        Some(yaml_vec) => yaml_vec.iter()
-            .filter_map(|x| x.as_str())
-            .map(|x| String::from(x))
-            .collect(),
-        _ => Vec::new()
+        Some(yaml_vec) => {
+            yaml_vec.iter()
+                .filter_map(|x| x.as_str())
+                .map(|x| String::from(x))
+                .collect()
+        }
+        _ => Vec::new(),
     }
 }
 
 fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
     let yaml_vec = yml.as_hash();
     match yaml_vec {
-        Some(yaml_vec) => yaml_vec.iter().filter_map(|(k, v)| {
-            match (k.as_str(), v.as_str()) {
-                (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                _ => None
-            }
-        }).collect(),
-        _ => HashMap::new()
+        Some(yaml_vec) => {
+            yaml_vec.iter()
+                .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
+                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                    _ => None,
+                })
+                .collect()
+        }
+        _ => HashMap::new(),
     }
 }
 
 fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
     let yaml_vec = yml.as_hash();
     match yaml_vec {
-        Some(yaml_vec) => yaml_vec.iter().filter_map(|(k, v)| {
-            match k.as_str() {
-                Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
-                _ => None
-            }
-        }).collect(),
-        _ => HashMap::new()
+        Some(yaml_vec) => {
+            yaml_vec.iter()
+                .filter_map(|(k, v)| match k.as_str() {
+                    Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
+                    _ => None,
+                })
+                .collect()
+        }
+        _ => HashMap::new(),
     }
 }
 
@@ -132,14 +139,14 @@ fn get_file_path(path: &PathBuf) -> String {
     src
 }
 
-fn update_path(cwd: &str, mut env: &mut HashMap<String,String>) {
+fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
     if let Some(path) = env.get_mut("PATH") {
         *path = load_path(cwd, &path);
     }
 }
 
 pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, Task>) {
-    for (k,v) in update {
+    for (k, v) in update {
         if let Some(t) = base.get_mut(k) {
             t.update(v);
         }

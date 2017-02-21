@@ -18,7 +18,7 @@ struct Execution<'a> {
     verbose: bool,
 }
 
-impl <'a>Execution<'a> {
+impl<'a> Execution<'a> {
     pub fn execute(&'a self) -> Option<()> {
         let name = format!("{}/{}", self.project.name, self.task.name);
         if self.dry_run {
@@ -30,7 +30,7 @@ impl <'a>Execution<'a> {
         let took = format!("{}.{:>0w$}s",
                            took.as_secs(),
                            took.subsec_nanos() / 1000,
-                           w=6);
+                           w = 6);
         match status {
             Some(_) => out!("{}: Completed, Took: {}", name, took),
             _ => out!("{}: Failed, Took: {}", name, took),
@@ -63,8 +63,8 @@ impl <'a>Execution<'a> {
 
     fn execute_task(&'a self) -> Option<()> {
         self.execute_cmd(&self.task.before)
-            .and_then(|_| { self.execute_cmd(&self.task.cmd) })
-            .and_then(|_| { self.execute_cmd(&self.task.after) })
+            .and_then(|_| self.execute_cmd(&self.task.cmd))
+            .and_then(|_| self.execute_cmd(&self.task.after))
     }
 
     #[cfg(windows)]
@@ -87,10 +87,11 @@ impl <'a>Execution<'a> {
             if cmd == "" {
                 return Some(());
             }
-            let mut cmd = match template::template_str(&cmd, &self.project.env, &self.query.params) {
-                Ok(s) => s,
-                _ => cmd.clone()
-            };
+            let mut cmd =
+                match template::template_str(&cmd, &self.project.env, &self.query.params) {
+                    Ok(s) => s,
+                    _ => cmd.clone(),
+                };
             if let Some(ref shell) = self.task.shell {
                 if shell != "" {
                     cmd = format!("{} {}", shell, cmd);
@@ -104,19 +105,14 @@ impl <'a>Execution<'a> {
                     command.env(k, v);
                 }
             }
-            command
-                .env("myke", current_exe().unwrap().to_str().unwrap())
+            command.env("myke", current_exe().unwrap().to_str().unwrap())
                 .env("MYKE_PROJECT", &self.project.name)
                 .env("MYKE_TASK", &self.task.name)
                 .env("MYKE_CWD", &self.project.cwd)
                 .arg(&cmd)
                 .current_dir(&self.project.cwd);
             let status = run(&mut command, &format!("failed to execute {}", cmd));
-            if status.success() {
-                Some(())
-            } else {
-                None
-            }
+            if status.success() { Some(()) } else { None }
         } else {
             Some(())
         }
@@ -141,7 +137,7 @@ pub fn execute(w: &Workspace, q: &Query, dry_run: bool, verbose: bool) -> Result
         return Err(format!("no task matched {}", q.task));
     }
     for (p, t) in matches {
-        let e = Execution{
+        let e = Execution {
             query: q,
             project: &p,
             task: &t,

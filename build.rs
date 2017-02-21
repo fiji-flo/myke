@@ -6,12 +6,14 @@ use std::path::Path;
 use glob::glob;
 
 fn main() {
-    let tests = glob("examples/**/*.rs").expect("Failed to read glob pattern").filter_map(|entry| {
-        match entry {
+    let tests = glob("examples/**/*.rs")
+        .expect("Failed to read glob pattern")
+        .filter_map(|entry| match entry {
             Ok(path) => copy(&path),
-            _ => None
-        }
-    }).map(|file_name| { convert(file_name)}).collect::<Vec<String>>();
+            _ => None,
+        })
+        .map(|file_name| convert(file_name))
+        .collect::<Vec<String>>();
     make_mod(&tests);
 }
 
@@ -20,7 +22,7 @@ fn copy(path: &Path) -> Option<String> {
     let to = Path::new("src/myke/tests/").join(file_name);
     match fs::copy(path, to) {
         Ok(_) => Some(String::from(file_name.to_str().unwrap())),
-        _ => None
+        _ => None,
     }
 }
 

@@ -25,7 +25,7 @@ impl Query {
         let cmd = rparams.pop_front().unwrap_or(String::new());
         let mut cmds: Vec<&str> = cmd.split("/").collect();
         let task = String::from(cmds.pop().unwrap_or(""));
-        let tags = cmds.iter().map(|t| { String::from(*t) }).collect();
+        let tags = cmds.iter().map(|t| String::from(*t)).collect();
 
         let mut params = HashMap::new();
 
@@ -42,7 +42,7 @@ impl Query {
             raw: raw,
             task: task,
             tags: tags,
-            params: params
+            params: params,
         }
     }
 
@@ -55,11 +55,10 @@ impl Query {
     }
 
     fn search_in_project<'a>(&self, p: &'a Project) -> Vec<(&'a Project, &'a Task)> {
-        p.tasks.iter().filter_map(
-            |(_, t)| {
-                self.matches_(&p, &t)
-            }
-        ).collect()
+        p.tasks
+            .iter()
+            .filter_map(|(_, t)| self.matches_(&p, &t))
+            .collect()
     }
 
     fn matches_<'a>(&self, p: &'a Project, t: &'a Task) -> Option<(&'a Project, &'a Task)> {
@@ -74,12 +73,12 @@ impl Query {
             }
         }
         if Pattern::new(&self.task).unwrap().matches(&t.name) {
-            return Some((p ,t));
+            return Some((p, t));
         }
         None
     }
 }
 
 pub fn parse_queries(param_groups: &mut ParamGroups) -> Vec<Query> {
-    param_groups.iter_mut().map(|mut q| { Query::parse(q) }).collect()
+    param_groups.iter_mut().map(|mut q| Query::parse(q)).collect()
 }

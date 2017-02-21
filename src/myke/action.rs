@@ -58,18 +58,18 @@ pub fn action(mut param_groups: utils::ParamGroups) {
 
 fn template(path: String) {
     let p = Path::new(&path);
-    match template::template_file(&p , env::vars()) {
+    match template::template_file(&p, env::vars()) {
         Ok(s) => out!("{}", s),
         Err(TemplateError::Required) => {
             out!("[TEMPLATE_ERROR] missing required argument");
             #[cfg(not(test))]
             process::exit(1);
-        },
-        Err(TemplateError::Unknown) =>  {
+        }
+        Err(TemplateError::Unknown) => {
             out!("[TEMPLATE_ERROR]: unknown error :/");
             #[cfg(not(test))]
             process::exit(1);
-        },
+        }
     };
 }
 
@@ -129,7 +129,7 @@ fn parse(options: VecDeque<String>) -> Action {
         return Action::Version;
     }
     if let Some(file) = options.get_by_prefix("--template=") {
-        return Action::Template(file)
+        return Action::Template(file);
     }
 
     let file = options.get_by_prefix("--file=").unwrap_or(String::from("myke.yml"));
@@ -150,11 +150,12 @@ trait Parse {
 
 impl Parse for VecDeque<String> {
     fn has(&self, m: &str) -> bool {
-        self.iter().any(|s| {s == m})
+        self.iter().any(|s| s == m)
     }
     fn get_by_prefix(&self, prefix: &str) -> Option<String> {
-        self.iter().filter(|s| { s.starts_with(prefix)}).next().and_then(
-            |s| { Some(s.replace(prefix, "")) }
-        )
+        self.iter()
+            .filter(|s| s.starts_with(prefix))
+            .next()
+            .and_then(|s| Some(s.replace(prefix, "")))
     }
 }
