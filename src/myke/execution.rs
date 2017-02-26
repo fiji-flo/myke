@@ -40,11 +40,11 @@ impl<'a> Execution<'a> {
 
     fn retry(&'a self) -> Option<()> {
         for i in 0..(self.task.retry + 1) {
-            if let Some(_) = self.execute_task() {
+            if self.execute_task().is_some() {
                 return Some(());
             }
             if let Some(ref err) = self.task.error {
-                if err.len() > 0 {
+                if !err.is_empty() {
                     out!("{}", err);
                 }
             }
@@ -83,12 +83,12 @@ impl<'a> Execution<'a> {
     }
 
     fn execute_cmd(&'a self, cmd: &Option<String>) -> Option<()> {
-        if let &Some(ref cmd) = cmd {
+        if let Some(ref cmd) = *cmd {
             if cmd == "" {
                 return Some(());
             }
             let mut cmd =
-                match template::template_str(&cmd, &self.project.env, &self.query.params) {
+                match template::template_str(cmd, &self.project.env, &self.query.params) {
                     Ok(s) => s,
                     _ => cmd.clone(),
                 };
@@ -139,12 +139,12 @@ pub fn execute(w: &Workspace, q: &Query, dry_run: bool, verbose: bool) -> Result
     for (p, t) in matches {
         let e = Execution {
             query: q,
-            project: &p,
-            task: &t,
+            project: p,
+            task: t,
             dry_run: dry_run,
             verbose: verbose,
         };
-        if let None = e.execute() {
+        if e.execute().is_none() {
             return Err(String::from("Something went wrong :/"));
         }
     }

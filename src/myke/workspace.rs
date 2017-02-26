@@ -13,7 +13,7 @@ impl Workspace {
         let mut projects = Vec::new();
         let cwd = utils::get_cwd(&PathBuf::from(path));
         let src = utils::get_file_path(&PathBuf::from(path));
-        Workspace::traverse(&src.unwrap_or(cwd.clone()), None, &mut projects);
+        Workspace::traverse(&src.unwrap_or_else(|| cwd.clone()), None, &mut projects);
         Workspace {
             cwd: cwd,
             projects: projects,

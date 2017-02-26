@@ -85,14 +85,11 @@ impl fmt::Display for Project {
 }
 
 fn get_file_path(path: &PathBuf) -> String {
-    let is_file = path.is_file();
-
-    let src = if is_file {
+    if path.is_file() {
         String::from(path.to_str().unwrap())
     } else {
         String::from(path.join("myke.yml").to_str().unwrap())
-    };
-    src
+    }
 }
 
 fn extract_string_vec(yml: &Yaml) -> Vec<String> {
@@ -101,7 +98,7 @@ fn extract_string_vec(yml: &Yaml) -> Vec<String> {
         Some(yaml_vec) => {
             yaml_vec.iter()
                 .filter_map(|x| x.as_str())
-                .map(|x| String::from(x))
+                .map(String::from)
                 .collect()
         }
         _ => Vec::new(),

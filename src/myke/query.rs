@@ -22,8 +22,8 @@ pub struct Query {
 impl Query {
     pub fn parse(mut rparams: &mut VecDeque<String>) -> Query {
         let raw = join(rparams.clone(), " ");
-        let cmd = rparams.pop_front().unwrap_or(String::new());
-        let mut cmds: Vec<&str> = cmd.split("/").collect();
+        let cmd = rparams.pop_front().unwrap_or_default();
+        let mut cmds: Vec<&str> = cmd.split('/').collect();
         let task = String::from(cmds.pop().unwrap_or(""));
         let tags = cmds.iter().map(|t| String::from(*t)).collect();
 
@@ -49,7 +49,7 @@ impl Query {
     pub fn search<'a>(&self, w: &'a Workspace) -> Vec<(&'a Project, &'a Task)> {
         let mut matches = Vec::new();
         for p in &w.projects {
-            matches.append(&mut self.search_in_project(&p));
+            matches.append(&mut self.search_in_project(p));
         }
         matches
     }
@@ -57,7 +57,7 @@ impl Query {
     fn search_in_project<'a>(&self, p: &'a Project) -> Vec<(&'a Project, &'a Task)> {
         p.tasks
             .iter()
-            .filter_map(|(_, t)| self.matches_(&p, &t))
+            .filter_map(|(_, t)| self.matches_(p, t))
             .collect()
     }
 

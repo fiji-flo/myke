@@ -13,7 +13,7 @@ use std::time::Duration;
 pub type ParamGroups = VecDeque<VecDeque<String>>;
 
 pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
-    let mut env = String::from(src.clone().trim_right_matches(".yml"));
+    let mut env = String::from(src.trim_right_matches(".yml"));
     env.push_str(".env");
     env_files.push(env);
 }
@@ -29,13 +29,13 @@ pub fn load_path(cwd: &str, path: &str) -> String {
         .collect::<Vec<_>>();
     paths.push(Path::new(cwd).join("bin"));
     match env::join_paths(paths) {
-        Ok(s) => s.into_string().unwrap_or(path.to_owned()),
+        Ok(s) => s.into_string().unwrap_or_else(|_| path.to_owned()),
         _ => path.to_owned(),
     }
 }
 
-pub fn load_env(env_files: &Vec<String>, mut env: &mut HashMap<String, String>) {
-    for ref env_file in env_files {
+pub fn load_env(env_files: &[String], mut env: &mut HashMap<String, String>) {
+    for env_file in env_files {
         merge_env(&mut env, &parse_env_file(env_file), true);
         let mut local = String::from((*env_file).clone());
         local.push_str(".local");
@@ -69,7 +69,7 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
         match file.read_to_string(&mut env_str) {
             Ok(_) => {
                 let env_vec = env_str.lines()
-                    .map(|line| line.splitn(2, "="))
+                    .map(|line| line.splitn(2, '='))
                     .map(|mut split| (split.next(), split.last()))
                     .filter_map(|(k, v)| match (k, v) {
                         (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
@@ -86,7 +86,7 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
     HashMap::new()
 }
 
-pub fn merge_vec<T: Eq + Clone>(target: &mut Vec<T>, from: &Vec<T>) {
+pub fn merge_vec<T: Eq + Clone>(target: &mut Vec<T>, from: &[T]) {
     for x in from {
         if !target.into_iter().any(|y| x == y) {
             target.push(x.clone());
@@ -99,7 +99,7 @@ pub fn prepend_path(path: &str, update: &str) -> String {
     let mut update_paths = env::split_paths(&update).collect::<Vec<_>>();
     update_paths.extend(paths);
     match env::join_paths(update_paths) {
-        Ok(s) => s.into_string().unwrap_or(path.to_owned()),
+        Ok(s) => s.into_string().unwrap_or_else(|_| path.to_owned()),
         _ => path.to_owned(),
     }
 }
@@ -135,29 +135,25 @@ pub fn get_file_path(path: &PathBuf) -> Option<String> {
 
 
 pub fn get_cwd(path: &PathBuf) -> String {
-    let is_file = path.is_file();
     let full_path = match fs::canonicalize(path) {
         Ok(p) => p,
         _ => path.clone(),
     };
 
-    let cwd = if is_file {
+    if path.is_file() {
         String::from(full_path.parent().unwrap().to_str().unwrap())
     } else {
         String::from(full_path.to_str().unwrap())
-    };
-    cwd
+    }
 }
 
-pub fn add_to_path(update: &String) -> String {
+pub fn add_to_path(update: &str) -> String {
     if let Some(path) = env::var_os("PATH") {
-        match path.to_str() {
-            Some(p) => prepend_path(update, p),
-            None => update.clone(),
+        if let Some(p) = path.to_str() {
+            return prepend_path(update, p);
         }
-    } else {
-        update.clone()
     }
+    update.to_owned()
 }
 
 pub fn parse_duration(duration_str: &str) -> Duration {
@@ -168,18 +164,19 @@ pub fn parse_duration(duration_str: &str) -> Duration {
         };
         return Duration::from_millis(ms);
     }
-    if duration_str.ends_with("ms") {
-        let s = match duration_str.trim_right_matches("s").parse::<u64>() {
+    if duration_str.ends_with('s') {
+        let s = match duration_str.trim_right_matches('s').parse::<u64>() {
             Ok(s) => s,
             _ => 1,
         };
-        return Duration::from_secs(s);
+        Duration::from_secs(s)
+    } else {
+        Duration::from_secs(1)
     }
-    return Duration::from_secs(1);
 }
 
 pub fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
     if let Some(path) = env.get_mut("PATH") {
-        *path = load_path(cwd, &path);
+        *path = load_path(cwd, path);
     }
 }

@@ -58,7 +58,7 @@ pub fn action(mut param_groups: utils::ParamGroups) {
 
 fn template(path: String) {
     let p = Path::new(&path);
-    match template::template_file(&p, env::vars()) {
+    match template::template_file(p, env::vars()) {
         Ok(s) => out!("{}", s),
         Err(TemplateError::Required) => {
             out!("[TEMPLATE_ERROR] missing required argument");
@@ -132,7 +132,7 @@ fn parse(options: VecDeque<String>) -> Action {
         return Action::Template(file);
     }
 
-    let file = options.get_by_prefix("--file=").unwrap_or(String::from("myke.yml"));
+    let file = options.get_by_prefix("--file=").unwrap_or_else(|| String::from("myke.yml"));
 
     if options.has("--dry-run") || options.has("-n") {
         return Action::DryRun(file);
@@ -154,8 +154,7 @@ impl Parse for VecDeque<String> {
     }
     fn get_by_prefix(&self, prefix: &str) -> Option<String> {
         self.iter()
-            .filter(|s| s.starts_with(prefix))
-            .next()
+            .find(|s| s.starts_with(prefix))
             .and_then(|s| Some(s.replace(prefix, "")))
     }
 }

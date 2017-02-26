@@ -28,10 +28,10 @@ pub fn template_str(string: &str,
     let tmpl = liquid::parse(string, Default::default()).unwrap();
     let mut ctx = Context::new();
     for (k, v) in env {
-        ctx.set_val(&k, Value::Str(v.clone()));
+        ctx.set_val(k, Value::Str(v.clone()));
     }
     for (k, v) in params {
-        ctx.set_val(&k, Value::Str(v.clone()));
+        ctx.set_val(k, Value::Str(v.clone()));
     }
     template(&tmpl, ctx)
 }
@@ -39,8 +39,8 @@ pub fn template_str(string: &str,
 pub fn template(tmpl: &Template, mut ctx: Context) -> Result<String, TemplateError> {
     ctx.add_filter("required",
                    Box::new(|input, _args| {
-        if let &Value::Str(ref s) = input {
-            if s.len() == 0 {
+        if let Value::Str(ref s) = *input {
+            if s.is_empty() {
                 return Err(FilterError::InvalidType("Expected value".to_owned()));
             }
         }
@@ -48,8 +48,8 @@ pub fn template(tmpl: &Template, mut ctx: Context) -> Result<String, TemplateErr
     }));
     ctx.add_filter("default",
                    Box::new(|input, args| {
-        if let &Value::Str(ref s) = input {
-            if s.len() == 0 {
+        if let Value::Str(ref s) = *input {
+            if s.is_empty() {
                 if let Some(&Value::Str(ref d)) = args.get(0) {
                     return Ok(Value::Str(d.clone()));
                 }
