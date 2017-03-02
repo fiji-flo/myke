@@ -1,9 +1,6 @@
-FROM golang:1.7
+from liuchong/rustup:stable-musl
 
-WORKDIR /go/src/github.com/goeuro/myke
-COPY Godeps Godeps
-COPY bin/init.sh bin/
-RUN bin/init.sh
+WORKDIR /src
+ADD . /src
 
-COPY . /go/src/github.com/goeuro/myke
-CMD ["bin/cross-compile.sh"]
+RUN cargo test  -- --nocapture --test-threads=1
