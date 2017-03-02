@@ -11,7 +11,7 @@ macro_rules! capture {
 }
 static mut OUT: *const Out = &Void;
 
-pub trait Out: Sync+Send {
+pub trait Out: Sync + Send {
     fn out(&self, buf: String);
     fn dump(&self) -> Option<String>;
 }
@@ -20,7 +20,9 @@ struct Void;
 
 impl Out for Void {
     fn out(&self, _: String) {}
-    fn dump(&self) -> Option<String> { None }
+    fn dump(&self) -> Option<String> {
+        None
+    }
 }
 
 pub fn out(buf: String) {
@@ -36,9 +38,7 @@ pub fn set(cap: Box<Out>) {
 }
 
 pub fn dump() -> Option<String> {
-    unsafe {
-        (*OUT).dump()
-    }
+    unsafe { (*OUT).dump() }
 }
 
 pub fn void() {
@@ -58,7 +58,7 @@ impl Out for Cappy {
     fn dump(&self) -> Option<String> {
         match self.buf.lock() {
             Ok(mut b) => Some(itertools::join(b.drain(0..), "")),
-            Err(_) => None
+            Err(_) => None,
         }
     }
 }
