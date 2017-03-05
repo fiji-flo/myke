@@ -8,10 +8,13 @@ build = "build.rs"
 yaml-rust = "^0.3.5"
 itertools = "^0.5.9"
 humantime = "^1.0.0"
-prettytable-rs = "^0.6"
 regex = "^0.2"
 glob = "^0.2.11"
 liquid = "^0.9"
+term_size = "0.2.3"
+
+[dependencies.lazytable]
+git = "https://github.com/fiji-flo/lazytable.git"
 
 [dependencies.capture]
 path = "capture"

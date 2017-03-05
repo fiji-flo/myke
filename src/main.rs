@@ -1,8 +1,6 @@
 #[cfg(test)]
 #[macro_use]
 extern crate capture;
-#[macro_use]
-extern crate prettytable;
 mod myke;
 
 use myke::action;

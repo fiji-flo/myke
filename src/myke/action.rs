@@ -1,3 +1,5 @@
+extern crate lazytable;
+extern crate term_size;
 extern crate regex;
 
 use myke::execution;
@@ -6,8 +8,6 @@ use myke::utils;
 use myke::template;
 use myke::template::TemplateError;
 use myke::workspace::Workspace;
-use prettytable::format;
-use prettytable::Table;
 use std::collections::VecDeque;
 use std::env;
 use std::path::Path;
@@ -43,20 +43,20 @@ enum Action {
 }
 
 pub fn action(mut param_groups: utils::ParamGroups) {
-    let a = parse(param_groups.pop_front().unwrap());
+    let a = parse(&param_groups.pop_front().unwrap());
 
     match a {
         Action::Help => out!("{}", USAGE),
         Action::Version => out!("{}", VERSION),
-        Action::DryRun(file) => run(file, param_groups, true, false),
-        Action::VerboseRun(file) => run(file, param_groups, false, true),
-        Action::Run(file) => run(file, param_groups, false, false),
-        Action::Template(file) => template(file),
+        Action::DryRun(file) => run(&file, param_groups, true, false),
+        Action::VerboseRun(file) => run(&file, param_groups, false, true),
+        Action::Run(file) => run(&file, param_groups, false, false),
+        Action::Template(file) => template(&file),
         _ => {}
     }
 }
 
-fn template(path: String) {
+fn template(path: &str) {
     let p = Path::new(&path);
     match template::template_file(p, env::vars()) {
         Ok(s) => out!("{}", s),
@@ -73,8 +73,8 @@ fn template(path: String) {
     };
 }
 
-fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool, verbose: bool) {
-    let workspace = Workspace::parse(&path);
+fn run(path: &str, mut param_groups: utils::ParamGroups, dry_run: bool, verbose: bool) {
+    let workspace = Workspace::parse(path);
     let queries = query::parse_queries(&mut param_groups);
     if queries.is_empty() {
         list(&workspace);
@@ -92,33 +92,22 @@ fn run(path: String, mut param_groups: utils::ParamGroups, dry_run: bool, verbos
 }
 
 pub fn list(workspace: &Workspace) {
-    let mut table = Table::new();
-    table.set_titles(row![b->"PROJECT", b->"TAGS", b->"TASKS"]);
+    #[cfg(not(test))]
+    let width = term_size::dimensions().and_then(|(w, _)| Some(w)).unwrap_or(1000);
+    #[cfg(not(test))]
+    let mut table = lazytable::Table::with_width(width);
+    #[cfg(test)]
+    let mut table = lazytable::Table::with_width(1000);
+    table.set_title(vec!["PROJECT".to_owned(), "TAGS".to_owned(), "TASKS".to_owned()]);
     for p in &workspace.projects {
         if let Some((name, tags, tasks)) = p.get_columns() {
-            table.add_row(row![name, tags, tasks]);
+            table.add_row(vec![name, tags, tasks]);
         }
     }
-    if table.get_row(0).is_none() {
-        table.add_row(row!["", "", ""]);
-    }
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-    print_list(&table);
+    out!("{}", table);
 }
 
-#[cfg(not(test))]
-fn print_list(table: &Table) {
-    table.printstd();
-}
-
-#[cfg(test)]
-fn print_list(table: &Table) {
-    let mut buf = Vec::new();
-    assert!(table.print(&mut buf).is_ok());
-    out!("{}", String::from_utf8(buf).unwrap());
-}
-
-fn parse(options: VecDeque<String>) -> Action {
+fn parse(options: &VecDeque<String>) -> Action {
     if options.has("--help") || options.has("-h") {
         return Action::Help;
     }
