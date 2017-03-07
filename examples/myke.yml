@@ -7,4 +7,5 @@ discover:
   - mixin
   - retry
   - tag
+  - tasks
   - template
