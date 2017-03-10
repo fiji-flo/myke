@@ -5,6 +5,8 @@ use myke::utils;
 use myke::template;
 use myke::workspace::Workspace;
 #[cfg(windows)]
+use std::ffi::OsString;
+#[cfg(windows)]
 use std::env;
 use std::env::current_exe;
 use std::process::{Command, ExitStatus};
@@ -71,7 +73,8 @@ impl<'a> Execution<'a> {
 
     #[cfg(windows)]
     fn shell() -> Command {
-        let cmd_exe = env::var_os("ComSpec").unwrap_or(r"C:\Windows\system32\cmd.exe");
+        let cmd_exe = env::var_os("ComSpec")
+            .unwrap_or(OsString::from(r"C:\Windows\system32\cmd.exe"));
         let mut cmd = Command::new(cmd_exe);
         cmd.arg("/c");
         cmd
