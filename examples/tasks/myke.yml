@@ -1,0 +1,9 @@
+---
+project: tasks
+desc: |-
+  Prefix a task with _ to hide from the table.
+tasks:
+  visible:
+    cmd: echo visible
+  _hidden:
+    cmd: echo hidden

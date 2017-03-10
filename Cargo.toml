@@ -21,3 +21,5 @@ path = "capture"
 
 [build-dependencies]
 glob = "^0.2.11"
+checksums = "0.5.4"
+tempdir = "0.3"

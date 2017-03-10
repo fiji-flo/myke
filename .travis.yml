@@ -1,28 +1,87 @@
-language: go
-go_import_path: github.com/goeuro/myke
-go:
-- 1.7
+# Based on the "trust" template v0.1.1
+# https://github.com/japaric/trust/tree/v0.1.1
+
+dist: trusty
+language: rust
+services: docker
+sudo: required
+
+# TODO Rust builds on stable by default, this can be
+# overridden on a case by case basis down below.
+# rust: stable not specified in order to avoid making
+# a default job.
+
+env:
+  global:
+    # TODO Update this to match the name of your project.
+    - CRATE_NAME=trust
+
+matrix:
+  # TODO These are all the build jobs. Adjust as necessary. Comment out what you
+  # don't need
+  include:
+    # Linux
+    - env: TARGET=x86_64-unknown-linux-musl
+
+    # OSX
+    - env: TARGET=x86_64-apple-darwin
+      os: osx
+
+    # Other architectures
+    - env: TARGET=armv7-unknown-linux-gnueabihf
+
+    # Testing other channels
+    - env: TARGET=x86_64-unknown-linux-gnu
+      rust: nightly
+    - env: TARGET=x86_64-apple-darwin
+      os: osx
+      rust: nightly
+
+before_install: set -e
+
 install:
-- bin/init.sh
+  - sh ci/install.sh
+  - source ~/.cargo/env || true
+
 script:
-- gofmt -d -s -e . 2>&1 | tee -a fmt.out
-- test ! -s fmt.out
-- golint -set_exit_status .
-- go test ./...
-- bin/cross-compile.sh "$TRAVIS_TAG-$TRAVIS_COMMIT"
+  - cargo test -- --nocapture --test-threads=1
+  - bash ci/script.sh
+
+after_script: set +e
+
+before_deploy:
+  - sh ci/before_deploy.sh
+
 deploy:
+  # TODO update `api_key.secure`
+  # - Create a `public_repo` GitHub token. Go to: https://github.com/settings/tokens/new
+  # - Encrypt it: `travis encrypt YOUR_TOKEN`
+  # - Paste the output down here
+  api_key:
+    secure: VdZCcuQJKKvX3giFztj0zZwCkbn5dD+lFV2Js8yl5Y2GJZ6tNHBWS+gUjsCo5D20OG1xWXM+6bMahp/Zakm01MDnMIVeb7tzWIwss/dxn7ZijU2/bzXbCVHp9RV74Ow7Y/kMIjRZL6IuwE//aSafBB2ILGX+LQ29UQ7NqyHbR4MVqfjqGLdUTmHvP5E4ZjeQTbcXaFLiJallduDd6S/ElgwovPSPQPXBn519R1kcEZ+JAhmDiinOMjPxkf1i8WXU5H6QyTN+xKLKoGLL5jf8F+MkKHrFQ7RYEwvZy4PD921KjpXcBz63IpjHVTtXUzHsPs4xE0UqU/39+XP+A44murSawphMjoVVcitGFVDW1trsHev4QmdZihmffF8LkjwhfbBAKWqk+DVK9fYlvW6D7RA+ef3LDa9qS9Ye1ISYqaaryJ83AV4b3lEmb6v6wZvFF5bTVgBEe5hBFLvVsnFRmug/mw64DsHxBbPcl+F5hXxeQzJc/S+LTCJdi/F27zTYJFJHE2uDPNvDr2nNXLAcXXwhwEHE7OH0XvqBxivmXBmRNuZQ0MlboPpch0fz42ver6yx25k81L0FiMZ7epV9yowDq18XmWTKQAKLsnRX9ne9TGiHwED0B7KDlyTZPKl1rxmMLmo3147v64g8fOBHWPuzVoew5lKNZ9iKEwYfkNM=
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
+  on:
+    # TODO Here you can pick which targets will generate binary releases
+    # In this example, there are some targets that are tested using the stable
+    # and nightly channels. This condition makes sure there is only one release
+    # for such targets and that's generated using the stable channel
+    condition: $TRAVIS_RUST_VERSION = stable
+    tags: true
   provider: releases
   skip_cleanup: true
-  api_key:
-    secure: jrQutAMgQgtFNRe1Y/MuONPL0zK0X3uPPywmBuzBrbstbOwOrmKgo0ypogp9wi/1zFbLwe3d7iK22J7m6KOEZaI4iP/53NMvpez/1zylkxEegxIXe6AeHfeMnqrxAcjgNpxun4xuhTjkWmCLP9T5Cn1gQnznIthOS7yGESolO8x1TQ3wTcTwMs/WOPYVtXe66984AOyubT76RtfOag0EKhm5S/h+iMwqj1g5pDeCl8+tNNp9grOOAkSHu/HSx3BtQziMXEhLj2lJZHLAXDYm0NX+A5s+N+Kkgb7awoS5nYHKEzvF4WBMzC9Y5PK0XHv4k8bKb/u3gJXOOCOP9jTKQ45XS7w/xSCUa1k6cIZlGAPdJ/ZL3i5a3RQoeyto/i4+7z3w81jeWNsdWYvGUuJey/w6/I/0nebdj1P1zZsfHjg/B9YFz3O810Vrd1QCjQOIwxmKELp/MRkbmGiutauDxUbdp8jLBITYj2hMoChOowfciM3AAlt9+BgTR02jnXe46MmVO6cQQduDcoFetheNJLPN9qABLauUuto8LrAIkL/QhZ/SFPh2EaWrWx//+PIaquIF4DfIOrg9AfSE1zFr1fvmwOR7GtY7K7kxitu27NL751Bc99RiekJOb+Lk5Uda/wSp9O0hAiRrlPbeNsktqFgov7pxmgE78iEuRbhI7IY=
-  file:
-    - bin/myke_darwin_amd64
-    - bin/myke_linux_amd64
-    - bin/myke_windows_amd64.exe
-  on:
-    repo: goeuro/myke
-    branch: none
-    tags: true
-    condition: "$TRAVIS_TAG =~ ^v[0-9].+$"
+
+cache: cargo
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+branches:
+  only:
+    # release tags
+    - /^v\d+\.\d+\.\d+.*$/
+    - master
+
 notifications:
-  email: false
+  email:
+    on_success: never
