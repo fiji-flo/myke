@@ -66,7 +66,7 @@ deploy:
   api_key:
     secure: VdZCcuQJKKvX3giFztj0zZwCkbn5dD+lFV2Js8yl5Y2GJZ6tNHBWS+gUjsCo5D20OG1xWXM+6bMahp/Zakm01MDnMIVeb7tzWIwss/dxn7ZijU2/bzXbCVHp9RV74Ow7Y/kMIjRZL6IuwE//aSafBB2ILGX+LQ29UQ7NqyHbR4MVqfjqGLdUTmHvP5E4ZjeQTbcXaFLiJallduDd6S/ElgwovPSPQPXBn519R1kcEZ+JAhmDiinOMjPxkf1i8WXU5H6QyTN+xKLKoGLL5jf8F+MkKHrFQ7RYEwvZy4PD921KjpXcBz63IpjHVTtXUzHsPs4xE0UqU/39+XP+A44murSawphMjoVVcitGFVDW1trsHev4QmdZihmffF8LkjwhfbBAKWqk+DVK9fYlvW6D7RA+ef3LDa9qS9Ye1ISYqaaryJ83AV4b3lEmb6v6wZvFF5bTVgBEe5hBFLvVsnFRmug/mw64DsHxBbPcl+F5hXxeQzJc/S+LTCJdi/F27zTYJFJHE2uDPNvDr2nNXLAcXXwhwEHE7OH0XvqBxivmXBmRNuZQ0MlboPpch0fz42ver6yx25k81L0FiMZ7epV9yowDq18XmWTKQAKLsnRX9ne9TGiHwED0B7KDlyTZPKl1rxmMLmo3147v64g8fOBHWPuzVoew5lKNZ9iKEwYfkNM=
   file_glob: true
-  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET
+  file: myke-$TRAVIS_TAG-$TARGET
   on:
     # TODO Here you can pick which targets will generate binary releases
     # In this example, there are some targets that are tested using the stable
