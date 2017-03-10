@@ -142,8 +142,6 @@ impl Parse for VecDeque<String> {
         self.iter().any(|s| s == m)
     }
     fn get_by_prefix(&self, prefix: &str) -> Option<String> {
-        self.iter()
-            .find(|s| s.starts_with(prefix))
-            .and_then(|s| Some(s.replace(prefix, "")))
+        self.iter().find(|s| s.starts_with(prefix)).and_then(|s| Some(s.replace(prefix, "")))
     }
 }

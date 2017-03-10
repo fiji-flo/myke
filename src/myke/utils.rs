@@ -21,11 +21,11 @@ pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
 pub fn load_path(cwd: &str, path: &str) -> String {
     let mut paths = env::split_paths(path)
         .map(|p| {
-            if !p.has_root() {
-                return Path::new(cwd).join(p);
-            }
-            p
-        })
+                 if !p.has_root() {
+                     return Path::new(cwd).join(p);
+                 }
+                 p
+             })
         .collect::<Vec<_>>();
     paths.push(Path::new(cwd).join("bin"));
     match env::join_paths(paths) {
@@ -72,9 +72,9 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
                     .map(|line| line.splitn(2, '='))
                     .map(|mut split| (split.next(), split.last()))
                     .filter_map(|(k, v)| match (k, v) {
-                        (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                        _ => None,
-                    })
+                                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                                    _ => None,
+                                })
                     .collect::<Vec<(String, String)>>();
                 return HashMap::from_iter(env_vec);
             }
@@ -141,7 +141,10 @@ pub fn get_cwd(path: &PathBuf) -> String {
     };
 
     if path.is_file() {
-        String::from(full_path.parent().unwrap().to_str().unwrap())
+        String::from(full_path.parent()
+                         .unwrap()
+                         .to_str()
+                         .unwrap())
     } else {
         String::from(full_path.to_str().unwrap())
     }

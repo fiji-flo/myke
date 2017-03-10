@@ -70,9 +70,9 @@ impl Project {
         }
         Some((self.name.clone(),
               itertools::join(itertools::sorted(&self.tags), ", "),
-              itertools::join(itertools::sorted(self.tasks
-                                  .keys()
-                                  .filter(|x| !x.starts_with('_'))),
+              itertools::join(itertools::sorted(self.tasks.keys().filter(|x| {
+                                                                             !x.starts_with('_')
+                                                                         })),
                               ", ")))
     }
 }
@@ -114,9 +114,9 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
         Some(yaml_vec) => {
             yaml_vec.iter()
                 .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
-                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                    _ => None,
-                })
+                                (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                                _ => None,
+                            })
                 .collect()
         }
         _ => HashMap::new(),
@@ -129,9 +129,9 @@ fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
         Some(yaml_vec) => {
             yaml_vec.iter()
                 .filter_map(|(k, v)| match k.as_str() {
-                    Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
-                    _ => None,
-                })
+                                Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
+                                _ => None,
+                            })
                 .collect()
         }
         _ => HashMap::new(),
