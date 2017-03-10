@@ -1,6 +1,6 @@
 extern crate glob;
-extern crate checksums;
 extern crate tempdir;
+extern crate itertools;
 use std::io::prelude::*;
 use std::fs;
 use std::fs::File;
@@ -22,8 +22,8 @@ fn main() {
 fn copy(path: &Path) -> Option<String> {
     let file_name = path.file_name().unwrap();
     let to = Path::new("src/myke/tests/").join(file_name);
-    if hash(&path.to_path_buf()) != hash(&to) && fs::copy(path, to).is_err() {
-       None
+    if !same(&path.to_path_buf(), &to) && fs::copy(path, to).is_err() {
+        None
     } else {
         Some(String::from(file_name.to_str().unwrap()))
     }
@@ -46,10 +46,10 @@ fn convert(mut file_name: String) -> String {
     file_name
 }
 
-fn hash(file: &PathBuf) -> String {
-    if !file.exists() {
-        "".to_string()
+fn same(a: &PathBuf, b: &PathBuf) -> bool {
+    if let (Ok(a), Ok(b)) = (File::open(a), File::open(b)) {
+        itertools::equal(a.bytes().map(|x| x.unwrap()), b.bytes().map(|x| x.unwrap()))
     } else {
-        checksums::hash_file(file, checksums::Algorithm::MD5)
+        false
     }
 }
