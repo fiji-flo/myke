@@ -4,6 +4,8 @@ use myke::task::Task;
 use myke::utils;
 use myke::template;
 use myke::workspace::Workspace;
+#[cfg(windows)]
+use std::env;
 use std::env::current_exe;
 use std::process::{Command, ExitStatus};
 use std::string::String;
