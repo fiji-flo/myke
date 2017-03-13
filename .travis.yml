@@ -31,8 +31,9 @@ matrix:
     - env: TARGET=armv7-unknown-linux-gnueabihf
 
     # Testing other channels
-    - env: TARGET=x86_64-unknown-linux-gnu
-      rust: nightly
+    # seems to be broken right now :/
+    #- env: TARGET=x86_64-unknown-linux-gnu
+    # rust: nightly
     - env: TARGET=x86_64-apple-darwin
       os: osx
       rust: nightly
