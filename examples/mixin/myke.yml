@@ -5,7 +5,7 @@ desc: |-
   This will make it inherit all properties from the other YML file,
   including tasks, tags, env, env_files, PATH directories, etc.
 mixin:
-  - parent/
+  - parent
 env:
   KEY_2: value_child_2
   KEY_3: value_child_3
