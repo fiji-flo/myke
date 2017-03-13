@@ -23,7 +23,10 @@ macro_rules! update_task {
 macro_rules! concat_task {
     ($self_:ident $update:ident $field:ident) => {
         $self_.$field = match ($self_.$field.clone(), $update.$field.clone()) {
-            (Some(s), Some(u)) => Some(format!("{}\n{}", s, u)),
+            #[cfg(not(windows))]
+            (Some(s), Some(u)) => Some(format!("{} ; {}", s, u)),
+            #[cfg(windows)]
+            (Some(s), Some(u)) => Some(format!("{} & {}", s, u)),
             (Some(s), None) => Some(s),
             (None, Some(u)) => Some(u),
             _ => None
