@@ -9,7 +9,7 @@ main() {
 
     cross build --target $TARGET --release
 
-    cp target/$TARGET/release/myke $src/myke-$TRAVIS_TAG-$TARGET
+    cp target/$TARGET/release/myke $src/$CRATE_NAME-$TRAVIS_TAG-$TARGET
 }
 
 main

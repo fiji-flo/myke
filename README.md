@@ -1,4 +1,4 @@
-# myke [![Build Status](https://travis-ci.org/fiji-flo/myke.svg?branch=travis-ci)](https://travis-ci.org/fiji-flo/myke) [![Build status](https://ci.appveyor.com/api/projects/status/8egyhwbj0clpdfcm/branch/master?svg=true)](https://ci.appveyor.com/project/fiji-flo/myke/branch/master) [![Latest Release](https://img.shields.io/github/tag/fiji-flo/myke.svg)](https://github.com/fiji-flo/myke/releases/latest)
+# myke [![Build Status](https://travis-ci.org/fiji-flo/myke.svg?branch=master)](https://travis-ci.org/fiji-flo/myke) [![Build status](https://ci.appveyor.com/api/projects/status/8egyhwbj0clpdfcm/branch/master?svg=true)](https://ci.appveyor.com/project/fiji-flo/myke/branch/master) [![Latest Release](https://img.shields.io/github/tag/fiji-flo/myke.svg)](https://github.com/fiji-flo/myke/releases/latest)
 
 > myke makes it easy to write development tasks
 

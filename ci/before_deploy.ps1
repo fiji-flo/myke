@@ -5,7 +5,7 @@ $SRC_DIR = $PWD.Path
 
 Set-Location $ENV:Temp
 
-$BINARY = "$SRC_DIR\myke-$($Env:APPVEYOR_REPO_TAG_NAME)-$($Env:TARGET).exe"
+$BINARY = "$SRC_DIR\$($Env:CRATE_NAME)-$($Env:APPVEYOR_REPO_TAG_NAME)-$($Env:TARGET).exe"
 
 Copy-Item "$SRC_DIR\target\$($Env:TARGET)\release\myke.exe" "$BINARY"
 
