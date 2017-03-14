@@ -65,6 +65,11 @@ fn template(path: &str) {
             #[cfg(not(test))]
             process::exit(1);
         }
+        Err(TemplateError::Parsing(e)) => {
+            out!("[TEMPLATE_ERROR]: parsing error {}", e);
+            #[cfg(not(test))]
+            process::exit(1);
+        }
         Err(TemplateError::Unknown) => {
             out!("[TEMPLATE_ERROR]: unknown error :/");
             #[cfg(not(test))]

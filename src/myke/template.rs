@@ -2,38 +2,50 @@ extern crate liquid;
 
 use std::collections::HashMap;
 use std::path::Path;
-use self::liquid::{Renderable, Context, Value, FilterError, Template};
+use self::liquid::{Renderable, Context, Value, FilterError, Template, Error};
 
 pub enum TemplateError {
     Unknown,
     Required,
+    Parsing(Error),
 }
 
 
 pub fn template_file<T: Iterator<Item = (String, String)>>(file: &Path,
                                                            map: T)
                                                            -> Result<String, TemplateError> {
-    let tmpl = liquid::parse_file(file, Default::default()).unwrap();
-    let mut ctx = Context::new();
-    for (k, v) in map {
-        ctx.set_val(&k, Value::Str(v));
+    match liquid::parse_file(file, Default::default()) {
+        Ok(tmpl) => {
+            let mut ctx = Context::new();
+            for (k, v) in map {
+                ctx.set_val(&k, Value::Str(v));
+            }
+            template(&tmpl, ctx)
+        }
+        Err(e) => Err(TemplateError::Parsing(e)),
     }
-    template(&tmpl, ctx)
 }
 
 pub fn template_str(string: &str,
                     env: &HashMap<String, String>,
                     params: &HashMap<String, String>)
                     -> Result<String, TemplateError> {
-    let tmpl = liquid::parse(string, Default::default()).unwrap();
-    let mut ctx = Context::new();
-    for (k, v) in env {
-        ctx.set_val(k, Value::Str(v.clone()));
+    match liquid::parse(string, Default::default()) {
+        Ok(tmpl) => {
+            let mut ctx = Context::new();
+            for (k, v) in env {
+                ctx.set_val(k, Value::Str(v.clone()));
+            }
+            for (k, v) in params {
+                ctx.set_val(k, Value::Str(v.clone()));
+            }
+            template(&tmpl, ctx)
+        }
+        Err(e) => {
+            out!("ERROR parsing '{}' as template: {}", string, e);
+            Ok(string.to_owned())
+        }
     }
-    for (k, v) in params {
-        ctx.set_val(k, Value::Str(v.clone()));
-    }
-    template(&tmpl, ctx)
 }
 
 pub fn template(tmpl: &Template, mut ctx: Context) -> Result<String, TemplateError> {

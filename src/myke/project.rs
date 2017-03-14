@@ -31,25 +31,32 @@ impl Project {
         let mut file = try!(File::open(&src));
         let mut yml_str = String::new();
         try!(file.read_to_string(&mut yml_str));
-        let docs = YamlLoader::load_from_str(&yml_str).unwrap();
-        let doc = &docs[0];
-        let mut p = Project {
-            src: src,
-            cwd: cwd,
-            name: val!(doc, "project", ""),
-            desc: val!(doc, "desc", ""),
-            tags: extract_string_vec(&doc["tags"]),
-            discover: extract_string_vec(&doc["discover"]),
-            mixin: extract_string_vec(&doc["mixin"]),
-            env: extract_string_map(&doc["env"]),
-            env_files: extract_string_vec(&doc["env_files"]),
-            tasks: extract_task_map(&doc["tasks"]),
-        };
-        add_env_file(&p.src, &mut p.env_files);
-        load_env(&p.env_files, &mut p.env);
-        update_path(&p.cwd, &mut p.env);
-        p.mixin();
-        Ok(p)
+        match YamlLoader::load_from_str(&yml_str) {
+            Ok(docs) => {
+                let doc = &docs[0];
+                let mut p = Project {
+                    src: src,
+                    cwd: cwd,
+                    name: val!(doc, "project", ""),
+                    desc: val!(doc, "desc", ""),
+                    tags: extract_string_vec(&doc["tags"]),
+                    discover: extract_string_vec(&doc["discover"]),
+                    mixin: extract_string_vec(&doc["mixin"]),
+                    env: extract_string_map(&doc["env"]),
+                    env_files: extract_string_vec(&doc["env_files"]),
+                    tasks: extract_task_map(&doc["tasks"]),
+                };
+                add_env_file(&p.src, &mut p.env_files);
+                load_env(&p.env_files, &mut p.env);
+                update_path(&p.cwd, &mut p.env);
+                p.mixin();
+                Ok(p)
+            }
+            Err(e) => {
+                Err(io::Error::new(io::ErrorKind::InvalidInput,
+                                   format!("ERROR parsing {}: {}", src, e)))
+            }
+        }
     }
 
     fn mixin(&mut self) {

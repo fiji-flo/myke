@@ -9,6 +9,7 @@ use std::ffi::OsString;
 #[cfg(windows)]
 use std::env;
 use std::env::current_exe;
+use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 use std::string::String;
 use std::thread::sleep;
@@ -110,7 +111,8 @@ impl<'a> Execution<'a> {
                     command.env(k, v);
                 }
             }
-            command.env("myke", current_exe().unwrap().to_str().unwrap())
+            command.env("myke",
+                        current_exe().unwrap_or_else(|_| PathBuf::from("myke")))
                 .env("MYKE_PROJECT", &self.project.name)
                 .env("MYKE_TASK", &self.task.name)
                 .env("MYKE_CWD", &self.project.cwd)

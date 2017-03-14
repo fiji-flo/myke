@@ -25,11 +25,14 @@ impl Workspace {
         if let Some(path) = path {
             src.push(path);
         }
-        if let Ok(p) = Project::from(&src) {
-            for include in &p.discover {
-                Workspace::traverse(&p.cwd, Some(include), projects)
+        match Project::from(&src) {
+            Ok(p) => {
+                for include in &p.discover {
+                    Workspace::traverse(&p.cwd, Some(include), projects)
+                }
+                projects.push(p);
             }
-            projects.push(p);
+            Err(e) => out!("{}", e),
         }
     }
 }
