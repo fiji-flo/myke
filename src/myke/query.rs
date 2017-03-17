@@ -2,8 +2,8 @@ extern crate itertools;
 extern crate glob;
 extern crate regex;
 
-use self::itertools::join;
 use self::glob::Pattern;
+use self::itertools::join;
 use self::regex::Regex;
 use myke::project::Project;
 use myke::task::Task;

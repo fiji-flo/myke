@@ -1,14 +1,14 @@
 extern crate itertools;
 extern crate regex;
 
+use self::regex::Regex;
+use capture;
+use capture::Cappy;
+use myke::action;
+use myke::utils;
 use std::env;
 use std::path::Path;
 use std::sync::Mutex;
-use self::regex::Regex;
-use myke::action;
-use myke::utils;
-use capture;
-use capture::Cappy;
 
 #[cfg(test)]
 pub struct TestTable<'a> {

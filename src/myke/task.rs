@@ -1,9 +1,9 @@
 extern crate humantime;
 extern crate yaml_rust;
 
-use std::time::Duration;
-use myke::utils::parse_duration;
 use self::yaml_rust::Yaml;
+use myke::utils::parse_duration;
+use std::time::Duration;
 
 #[derive(Clone)]
 pub struct Task {

@@ -1,6 +1,7 @@
-use std::path::PathBuf;
 use myke::project::Project;
 use myke::utils;
+use std::io;
+use std::path::PathBuf;
 use std::string::String;
 
 pub struct Workspace {
@@ -32,7 +33,12 @@ impl Workspace {
                 }
                 projects.push(p);
             }
-            Err(e) => out!("{}", e),
+            Err(e) => {
+                match e.kind() {
+                    io::ErrorKind::NotFound => {}
+                    _ => out!("{}", e),
+                }
+            }
         }
     }
 }

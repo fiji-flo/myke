@@ -4,9 +4,9 @@ extern crate regex;
 
 use myke::execution;
 use myke::query;
-use myke::utils;
 use myke::template;
 use myke::template::TemplateError;
+use myke::utils;
 use myke::workspace::Workspace;
 use std::collections::VecDeque;
 use std::env;

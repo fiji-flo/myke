@@ -1,14 +1,14 @@
 use myke::project::Project;
 use myke::query::Query;
 use myke::task::Task;
-use myke::utils;
 use myke::template;
+use myke::utils;
 use myke::workspace::Workspace;
-#[cfg(windows)]
-use std::ffi::OsString;
 #[cfg(windows)]
 use std::env;
 use std::env::current_exe;
+#[cfg(windows)]
+use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 use std::string::String;

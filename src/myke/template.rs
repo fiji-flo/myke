@@ -1,8 +1,8 @@
 extern crate liquid;
 
+use self::liquid::{Context, Error, FilterError, Renderable, Template, Value};
 use std::collections::HashMap;
 use std::path::Path;
-use self::liquid::{Renderable, Context, Value, FilterError, Template, Error};
 
 pub enum TemplateError {
     Unknown,

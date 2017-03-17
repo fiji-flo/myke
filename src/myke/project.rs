@@ -1,15 +1,15 @@
 extern crate yaml_rust;
 extern crate itertools;
 
-use myke::utils::*;
+use self::yaml_rust::{Yaml, YamlLoader};
 use myke::task::Task;
+use myke::utils::*;
 use std::collections::HashMap;
 use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
-use self::yaml_rust::{Yaml, YamlLoader};
 
 pub struct Project {
     pub src: String,

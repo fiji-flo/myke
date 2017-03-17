@@ -1,11 +1,11 @@
 extern crate glob;
 extern crate tempdir;
 extern crate itertools;
-use std::io::prelude::*;
+use glob::glob;
 use std::fs;
 use std::fs::File;
+use std::io::prelude::*;
 use std::path::{Path, PathBuf};
-use glob::glob;
 
 fn main() {
     let tests = glob("examples/**/*.rs")
