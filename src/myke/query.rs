@@ -80,5 +80,8 @@ impl Query {
 }
 
 pub fn parse_queries(param_groups: &mut ParamGroups) -> Vec<Query> {
-    param_groups.iter_mut().map(|mut q| Query::parse(q)).collect()
+    param_groups
+        .iter_mut()
+        .map(|mut q| Query::parse(q))
+        .collect()
 }

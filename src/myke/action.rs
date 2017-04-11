@@ -98,7 +98,9 @@ fn run(path: &str, mut param_groups: utils::ParamGroups, dry_run: bool, verbose:
 
 pub fn list(workspace: &Workspace) {
     #[cfg(not(test))]
-    let width = term_size::dimensions().and_then(|(w, _)| Some(w)).unwrap_or(1000);
+    let width = term_size::dimensions()
+        .and_then(|(w, _)| Some(w))
+        .unwrap_or(1000);
     #[cfg(not(test))]
     let mut table = lazytable::Table::with_width(width);
     #[cfg(test)]
@@ -126,7 +128,9 @@ fn parse(options: &VecDeque<String>) -> Action {
         return Action::Template(file);
     }
 
-    let file = options.get_by_prefix("--file=").unwrap_or_else(|| String::from("myke.yml"));
+    let file = options
+        .get_by_prefix("--file=")
+        .unwrap_or_else(|| String::from("myke.yml"));
 
     if options.has("--dry-run") || options.has("-n") {
         return Action::DryRun(file);
@@ -147,6 +151,8 @@ impl Parse for VecDeque<String> {
         self.iter().any(|s| s == m)
     }
     fn get_by_prefix(&self, prefix: &str) -> Option<String> {
-        self.iter().find(|s| s.starts_with(prefix)).and_then(|s| Some(s.replace(prefix, "")))
+        self.iter()
+            .find(|s| s.starts_with(prefix))
+            .and_then(|s| Some(s.replace(prefix, "")))
     }
 }

@@ -69,7 +69,8 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
         let mut env_str = String::new();
         match file.read_to_string(&mut env_str) {
             Ok(_) => {
-                let env_vec = env_str.lines()
+                let env_vec = env_str
+                    .lines()
                     .map(|line| line.splitn(2, '='))
                     .map(|mut split| (split.next(), split.last()))
                     .filter_map(|(k, v)| match (k, v) {
@@ -142,10 +143,7 @@ pub fn get_cwd(path: &PathBuf) -> String {
     };
 
     if path.is_file() {
-        String::from(full_path.parent()
-                         .unwrap()
-                         .to_str()
-                         .unwrap())
+        String::from(full_path.parent().unwrap().to_str().unwrap())
     } else {
         String::from(full_path.to_str().unwrap())
     }
@@ -180,6 +178,9 @@ pub fn parse_duration(duration_str: &str) -> Duration {
 }
 
 pub fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
+    if !env.contains_key("PATH") {
+        env.insert("PATH".to_owned(), "".to_owned());
+    }
     if let Some(path) = env.get_mut("PATH") {
         *path = load_path(cwd, path);
     }

@@ -111,8 +111,9 @@ impl<'a> Execution<'a> {
                     command.env(k, v);
                 }
             }
-            command.env("myke",
-                        current_exe().unwrap_or_else(|_| PathBuf::from("myke")))
+            command
+                .env("myke",
+                     current_exe().unwrap_or_else(|_| PathBuf::from("myke")))
                 .env("MYKE_PROJECT", &self.project.name)
                 .env("MYKE_TASK", &self.task.name)
                 .env("MYKE_CWD", &self.project.cwd)

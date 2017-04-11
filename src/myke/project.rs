@@ -106,7 +106,8 @@ fn extract_string_vec(yml: &Yaml) -> Vec<String> {
     let yaml_vec = yml.as_vec();
     match yaml_vec {
         Some(yaml_vec) => {
-            yaml_vec.iter()
+            yaml_vec
+                .iter()
                 .filter_map(|x| x.as_str())
                 .map(String::from)
                 .collect()
@@ -119,7 +120,8 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
     let yaml_vec = yml.as_hash();
     match yaml_vec {
         Some(yaml_vec) => {
-            yaml_vec.iter()
+            yaml_vec
+                .iter()
                 .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
                                 (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
                                 _ => None,
@@ -134,7 +136,8 @@ fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
     let yaml_vec = yml.as_hash();
     match yaml_vec {
         Some(yaml_vec) => {
-            yaml_vec.iter()
+            yaml_vec
+                .iter()
                 .filter_map(|(k, v)| match k.as_str() {
                                 Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
                                 _ => None,
