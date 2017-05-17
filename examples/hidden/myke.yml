@@ -1,0 +1,6 @@
+---
+project: hidden
+desc: Usage hiding of tasks and projects.
+discover:
+  - something.yml
+  - nothing.yml

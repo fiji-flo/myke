@@ -9,3 +9,4 @@ discover:
   - tag
   - tasks
   - template
+  - hidden

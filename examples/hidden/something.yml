@@ -1,0 +1,5 @@
+---
+project: something
+tasks:
+  hello:
+    cmd: echo hello something

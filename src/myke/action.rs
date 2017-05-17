@@ -108,7 +108,9 @@ pub fn list(workspace: &Workspace) {
     table.set_title(vec!["PROJECT".to_owned(), "TAGS".to_owned(), "TASKS".to_owned()]);
     for p in &workspace.projects {
         if let Some((name, tags, tasks)) = p.get_columns() {
-            table.add_row(vec![name, tags, tasks]);
+            if !tasks.is_empty() {
+                table.add_row(vec![name, tags, tasks]);
+            }
         }
     }
     out!("{}", table);

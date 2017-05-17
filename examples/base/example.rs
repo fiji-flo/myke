@@ -10,6 +10,7 @@ myke_test!(
     "myke" => r"(?m)^\s*retry\s*\|\s*\|\s*retry\s*$";
     "myke" => r"(?m)^\s*tags1\s*\|\s*tagA, tagB\s*\|\s*tag\s*$";
     "myke" => r"(?m)^\s*tags2\s*\|\s*tagB, tagC\s*\|\s*tag\s*$";
-    "make" => r"(?m)^\s*tasks\s*\|\s*\|\s*visible\s*$";
+    "myke" => r"(?m)^\s*tasks\s*\|\s*\|\s*visible\s*$";
     "myke" => r"(?m)^\s*template\s*\|\s*\|\s*args, file\s*$";
+    "myke" => r"(?m)^\s*something\s*\|\s*\|\s*hello\s*$";
 );
