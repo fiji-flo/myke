@@ -177,7 +177,7 @@ pub fn parse_duration(duration_str: &str) -> Duration {
     }
 }
 
-pub fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
+pub fn update_path(cwd: &str, env: &mut HashMap<String, String>) {
     if !env.contains_key("PATH") {
         env.insert("PATH".to_owned(), "".to_owned());
     }

@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate gtmpl;
 #[cfg(test)]
 #[macro_use]
 extern crate capture;

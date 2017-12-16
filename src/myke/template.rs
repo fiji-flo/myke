@@ -1,67 +1,55 @@
-extern crate liquid;
+extern crate sprig;
+extern crate gtmpl_value;
 
-use self::liquid::{Context, Error, FilterError, Renderable, Template, Value};
+use gtmpl::{Context, Template, Func};
+use self::sprig::SPRIG;
+
+use std::fs::File;
+use std::io::prelude::*;
 use std::collections::HashMap;
 use std::path::Path;
 
-pub enum TemplateError {
-    Unknown,
-    Required,
-    Parsing(Error),
-}
-
-
 pub fn template_file<T: Iterator<Item = (String, String)>>(file: &Path,
-                                                           map: T)
-                                                           -> Result<String, TemplateError> {
-    match liquid::parse_file(file, Default::default()) {
-        Ok(tmpl) => {
-            let mut ctx = Context::new();
-            for (k, v) in map {
-                ctx.set_val(&k, Value::Str(v));
-            }
-            template(&tmpl, ctx)
-        }
-        Err(e) => Err(TemplateError::Parsing(e)),
-    }
+                                                           iter: T)
+                                                           -> Result<String, String> {
+    let mut f = File::open(file).map_err(|e| format!("file not found: {}", e))?;
+
+    let mut contents = String::new();
+    f.read_to_string(&mut contents).map_err(|e| format!("unable to read file: {}", e))?;
+    let map: HashMap<String, String> = iter.collect();
+    let tmpl = create_template(&contents)?;
+    tmpl.render(&Context::from(map)?)
 }
 
 pub fn template_str(string: &str,
                     env: &HashMap<String, String>,
                     params: &HashMap<String, String>)
-                    -> Result<String, TemplateError> {
-    match liquid::parse(string, Default::default()) {
-        Ok(tmpl) => {
-            let mut ctx = Context::new();
-            for (k, v) in env {
-                ctx.set_val(k, Value::Str(v.clone()));
-            }
-            for (k, v) in params {
-                ctx.set_val(k, Value::Str(v.clone()));
-            }
-            template(&tmpl, ctx)
-        }
-        Err(e) => {
-            out!("ERROR parsing '{}' as template: {}", string, e);
-            Ok(string.to_owned())
-        }
+                    -> Result<String, String> {
+    let mut map: HashMap<String, String> = HashMap::new();
+    for (k, v) in env {
+        map.insert(k.clone(), v.clone());
     }
+    for (k, v) in params {
+        map.insert(k.clone(), v.clone());
+    }
+    let tmpl = create_template(string)?;
+    tmpl.render(&Context::from(map)?)
 }
 
-pub fn template(tmpl: &Template, mut ctx: Context) -> Result<String, TemplateError> {
-    ctx.add_filter("required",
-                   Box::new(|input, _args| {
-        if let Value::Str(ref s) = *input {
-            if s.is_empty() {
-                return Err(FilterError::InvalidType("Expected value".to_owned()));
-            }
-        }
-        Ok(input.clone())
-    }));
-
-    match tmpl.render(&mut ctx) {
-        Ok(Some(s)) => Ok(s),
-        Err(liquid::Error::Filter(_)) => Err(TemplateError::Required),
-        _ => Err(TemplateError::Unknown),
-    }
+fn create_template(string: &str) -> Result<Template, String> {
+    let mut tmpl = Template::with_name("");
+    tmpl.add_funcs(SPRIG as &[(&str, Func)]);
+    tmpl.add_func("required", required);
+    tmpl.parse(string)?;
+    Ok(tmpl)
 }
+
+gtmpl_fn!(
+    fn required(arg: String) -> Result<String, String> {
+        if arg.is_empty() {
+            Err(String::from("missing required argument"))
+        } else {
+            Ok(arg)
+        }
+    }
+);

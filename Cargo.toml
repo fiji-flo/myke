@@ -5,15 +5,15 @@ authors = ["Florian Merz <flomerz@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
-yaml-rust = "^0.3.5"
-itertools = "^0.5.9"
-humantime = "^1.0.0"
-regex = "^0.2"
-glob = "^0.2.11"
-term_size = "0.2.3"
-
-[dependencies.liquid]
-git = "https://github.com/cobalt-org/liquid-rust.git"
+yaml-rust = "0.4"
+itertools = "0.7"
+humantime = "1"
+regex = "0.2"
+glob = "0.2"
+term_size = "0.3"
+gtmpl = { git = "https://github.com/fiji-flo/gtmpl-rust", branch = "func-revamp" }
+gtmpl_value = { git = "https://github.com/fiji-flo/gtmpl_value", branch = "map-n-novalue" }
+sprig = { git = "https://github.com/fiji-flo/sprig-rust", branch = "defaults" }
 
 [dependencies.lazytable]
 git = "https://github.com/fiji-flo/lazytable.git"
@@ -22,6 +22,6 @@ git = "https://github.com/fiji-flo/lazytable.git"
 path = "capture"
 
 [build-dependencies]
-glob = "^0.2.11"
-itertools = "^0.5.9"
+glob = "0.2"
+itertools = "0"
 tempdir = "0.3"

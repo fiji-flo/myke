@@ -2,7 +2,6 @@ use myke::project::Project;
 use myke::query::Query;
 use myke::task::Task;
 use myke::template;
-use myke::template::TemplateError;
 use myke::utils;
 use myke::workspace::Workspace;
 #[cfg(windows)]
@@ -97,11 +96,10 @@ impl<'a> Execution<'a> {
             let mut cmd =
                 match template::template_str(cmd, &self.project.env, &self.query.params) {
                     Ok(s) => s,
-                    Err(TemplateError::Required) => {
-                        out!("required parameter missing for: {}", cmd);
+                    Err(e) => {
+                        out!("{} in {}", e, cmd);
                         return None;
                     }
-                    _ => cmd.clone(),
                 };
             if let Some(ref shell) = self.task.shell {
                 if shell != "" {

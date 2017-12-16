@@ -5,7 +5,6 @@ extern crate regex;
 use myke::execution;
 use myke::query;
 use myke::template;
-use myke::template::TemplateError;
 use myke::utils;
 use myke::workspace::Workspace;
 use std::collections::VecDeque;
@@ -60,18 +59,8 @@ fn template(path: &str) {
     let p = Path::new(&path);
     match template::template_file(p, env::vars()) {
         Ok(s) => out!("{}", s),
-        Err(TemplateError::Required) => {
-            out!("[TEMPLATE_ERROR] missing required argument");
-            #[cfg(not(test))]
-            process::exit(1);
-        }
-        Err(TemplateError::Parsing(e)) => {
+        Err(e) => {
             out!("[TEMPLATE_ERROR]: parsing error {}", e);
-            #[cfg(not(test))]
-            process::exit(1);
-        }
-        Err(TemplateError::Unknown) => {
-            out!("[TEMPLATE_ERROR]: unknown error :/");
             #[cfg(not(test))]
             process::exit(1);
         }
