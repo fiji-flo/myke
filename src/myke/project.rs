@@ -53,8 +53,10 @@ impl Project {
                 Ok(p)
             }
             Err(e) => {
-                Err(io::Error::new(io::ErrorKind::InvalidInput,
-                                   format!("ERROR parsing {}: {}", src, e)))
+                Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    format!("ERROR parsing {}: {}", src, e),
+                ))
             }
         }
     }
@@ -75,22 +77,28 @@ impl Project {
         if self.tasks.is_empty() {
             return None;
         }
-        Some((self.name.clone(),
-              itertools::join(itertools::sorted(&self.tags), ", "),
-              itertools::join(itertools::sorted(self.tasks.keys().filter(|x| {
-                                                                             !x.starts_with('_')
-                                                                         })),
-                              ", ")))
+        Some((
+            self.name.clone(),
+            itertools::join(itertools::sorted(&self.tags), ", "),
+            itertools::join(
+                itertools::sorted(
+                    self.tasks.keys().filter(|x| !x.starts_with('_')),
+                ),
+                ", ",
+            ),
+        ))
     }
 }
 
 impl fmt::Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}\t{}\t{}",
-               self.name,
-               self.tags.join(","),
-               itertools::join(self.tasks.keys(), ","))
+        write!(
+            f,
+            "{}\t{}\t{}",
+            self.name,
+            self.tags.join(","),
+            itertools::join(self.tasks.keys(), ",")
+        )
     }
 }
 
@@ -123,9 +131,9 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
             yaml_vec
                 .iter()
                 .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
-                                (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                                _ => None,
-                            })
+                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                    _ => None,
+                })
                 .collect()
         }
         _ => HashMap::new(),
@@ -139,9 +147,9 @@ fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
             yaml_vec
                 .iter()
                 .filter_map(|(k, v)| match k.as_str() {
-                                Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
-                                _ => None,
-                            })
+                    Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
+                    _ => None,
+                })
                 .collect()
         }
         _ => HashMap::new(),

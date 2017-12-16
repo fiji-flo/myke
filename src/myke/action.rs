@@ -61,8 +61,7 @@ fn template(path: &str) {
         Ok(s) => out!("{}", s),
         Err(e) => {
             out!("[TEMPLATE_ERROR]: parsing error {}", e);
-            #[cfg(not(test))]
-            process::exit(1);
+            #[cfg(not(test))] process::exit(1);
         }
     };
 }
@@ -78,8 +77,7 @@ fn run(path: &str, mut param_groups: utils::ParamGroups, dry_run: bool, verbose:
             if verbose {
                 out!("[EXECUTION_ERROR]: {}", e);
             }
-            #[cfg(not(test))]
-            process::exit(1);
+            #[cfg(not(test))] process::exit(1);
         }
     }
 
@@ -94,7 +92,11 @@ pub fn list(workspace: &Workspace) {
     let mut table = lazytable::Table::with_width(width);
     #[cfg(test)]
     let mut table = lazytable::Table::with_width(1000);
-    table.set_title(vec!["PROJECT".to_owned(), "TAGS".to_owned(), "TASKS".to_owned()]);
+    table.set_title(vec![
+        "PROJECT".to_owned(),
+        "TAGS".to_owned(),
+        "TASKS".to_owned(),
+    ]);
     for p in &workspace.projects {
         if let Some((name, tags, tasks)) = p.get_columns() {
             if !tasks.is_empty() {
@@ -119,9 +121,9 @@ fn parse(options: &VecDeque<String>) -> Action {
         return Action::Template(file);
     }
 
-    let file = options
-        .get_by_prefix("--file=")
-        .unwrap_or_else(|| String::from("myke.yml"));
+    let file = options.get_by_prefix("--file=").unwrap_or_else(
+        || String::from("myke.yml"),
+    );
 
     if options.has("--dry-run") || options.has("-n") {
         return Action::DryRun(file);
@@ -142,8 +144,8 @@ impl Parse for VecDeque<String> {
         self.iter().any(|s| s == m)
     }
     fn get_by_prefix(&self, prefix: &str) -> Option<String> {
-        self.iter()
-            .find(|s| s.starts_with(prefix))
-            .and_then(|s| Some(s.replace(prefix, "")))
+        self.iter().find(|s| s.starts_with(prefix)).and_then(|s| {
+            Some(s.replace(prefix, ""))
+        })
     }
 }

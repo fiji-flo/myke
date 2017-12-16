@@ -23,15 +23,16 @@ pub fn run_cli_test<'a>(dir: &str, tests: &[TestTable]) {
     let cappy = Box::new(Cappy { buf: buf });
     capture::set(cappy);
     for test in tests {
-        chdir(dir,
-              &|| {
+        chdir(dir, &|| {
             run(&test.args);
             let out = capture::dump().unwrap_or("".to_owned());
             let re = Regex::new(test.expected).unwrap();
-            assert!(re.is_match(&out),
-                    "\nexpected:\n{}\n\ngot:\n{}",
-                    test.expected,
-                    out);
+            assert!(
+                re.is_match(&out),
+                "\nexpected:\n{}\n\ngot:\n{}",
+                test.expected,
+                out
+            );
         })
     }
     capture::void();
