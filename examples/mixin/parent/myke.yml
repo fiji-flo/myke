@@ -6,9 +6,9 @@ env:
   PATH: path_parent
 tasks:
   task1:
-    cmd: echo parent says {{ KEY_1 }}
+    cmd: echo parent says {{ .KEY_1 }}
   task2:
-    before: echo parent says {{ KEY_2 }}
+    before: echo parent says {{ .KEY_2 }}
   task4:
-    before: echo parent says {{ KEY_1 }}
-    cmd: echo parent says {{ KEY_2 }}
+    before: echo parent says {{ .KEY_1 }}
+    cmd: echo parent says {{ .KEY_2 }}

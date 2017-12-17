@@ -1,12 +1,13 @@
 #[cfg(test)]
 #[macro_use]
 extern crate capture;
+#[macro_use]
+extern crate gtmpl;
 mod myke;
 
 use myke::action;
 use myke::utils;
 use std::env;
-
 
 fn main() {
     let param_groups = utils::parse_param_groups(env::args().collect::<Vec<_>>());

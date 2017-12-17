@@ -1,11 +1,10 @@
 extern crate lazytable;
-extern crate term_size;
 extern crate regex;
+extern crate term_size;
 
 use myke::execution;
 use myke::query;
 use myke::template;
-use myke::template::TemplateError;
 use myke::utils;
 use myke::workspace::Workspace;
 use std::collections::VecDeque;
@@ -14,8 +13,8 @@ use std::path::Path;
 #[cfg(not(test))]
 use std::process;
 
-const VERSION: &'static str = "0.9";
-const USAGE: &'static str = "Usage:
+const VERSION: &str = "0.9";
+const USAGE: &str = "Usage:
   myke [--myke-options] [tag/]task [--task-options] ...
 
 myke options:
@@ -29,7 +28,6 @@ myke options:
 Help Options:
   --help      Show this help message
 ";
-
 
 #[derive(Debug)]
 enum Action {
@@ -60,18 +58,8 @@ fn template(path: &str) {
     let p = Path::new(&path);
     match template::template_file(p, env::vars()) {
         Ok(s) => out!("{}", s),
-        Err(TemplateError::Required) => {
-            out!("[TEMPLATE_ERROR] missing required argument");
-            #[cfg(not(test))]
-            process::exit(1);
-        }
-        Err(TemplateError::Parsing(e)) => {
+        Err(e) => {
             out!("[TEMPLATE_ERROR]: parsing error {}", e);
-            #[cfg(not(test))]
-            process::exit(1);
-        }
-        Err(TemplateError::Unknown) => {
-            out!("[TEMPLATE_ERROR]: unknown error :/");
             #[cfg(not(test))]
             process::exit(1);
         }
@@ -93,7 +81,6 @@ fn run(path: &str, mut param_groups: utils::ParamGroups, dry_run: bool, verbose:
             process::exit(1);
         }
     }
-
 }
 
 pub fn list(workspace: &Workspace) {
@@ -105,7 +92,11 @@ pub fn list(workspace: &Workspace) {
     let mut table = lazytable::Table::with_width(width);
     #[cfg(test)]
     let mut table = lazytable::Table::with_width(1000);
-    table.set_title(vec!["PROJECT".to_owned(), "TAGS".to_owned(), "TASKS".to_owned()]);
+    table.set_title(vec![
+        "PROJECT".to_owned(),
+        "TAGS".to_owned(),
+        "TASKS".to_owned(),
+    ]);
     for p in &workspace.projects {
         if let Some((name, tags, tasks)) = p.get_columns() {
             if !tasks.is_empty() {

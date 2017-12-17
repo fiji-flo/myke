@@ -11,9 +11,9 @@ fn main() {
     let tests = glob("examples/**/*.rs")
         .expect("Failed to read glob pattern")
         .filter_map(|entry| match entry {
-                        Ok(path) => copy(&path),
-                        _ => None,
-                    })
+            Ok(path) => copy(&path),
+            _ => None,
+        })
         .map(|file_name| convert(file_name))
         .collect::<Vec<String>>();
     make_mod(&tests);

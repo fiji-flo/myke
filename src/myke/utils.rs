@@ -22,11 +22,11 @@ pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
 pub fn load_path(cwd: &str, path: &str) -> String {
     let mut paths = env::split_paths(path)
         .map(|p| {
-                 if !p.has_root() {
-                     return Path::new(cwd).join(p);
-                 }
-                 p
-             })
+            if !p.has_root() {
+                return Path::new(cwd).join(p);
+            }
+            p
+        })
         .collect::<Vec<_>>();
     paths.push(Path::new(cwd).join("bin"));
     match env::join_paths(paths) {
@@ -38,7 +38,7 @@ pub fn load_path(cwd: &str, path: &str) -> String {
 pub fn load_env(env_files: &[String], mut env: &mut HashMap<String, String>) {
     for env_file in env_files {
         merge_env(&mut env, &parse_env_file(env_file), true);
-        let mut local = String::from((*env_file).clone());
+        let mut local = (*env_file).clone();
         local.push_str(".local");
         merge_env(&mut env, &parse_env_file(&local), true);
     }
@@ -74,9 +74,9 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
                     .map(|line| line.splitn(2, '='))
                     .map(|mut split| (split.next(), split.last()))
                     .filter_map(|(k, v)| match (k, v) {
-                                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                                    _ => None,
-                                })
+                        (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                        _ => None,
+                    })
                     .collect::<Vec<(String, String)>>();
                 return HashMap::from_iter(env_vec);
             }
@@ -135,7 +135,6 @@ pub fn get_file_path(path: &PathBuf) -> Option<String> {
     }
 }
 
-
 pub fn get_cwd(path: &PathBuf) -> String {
     let full_path = match fs::canonicalize(path) {
         Ok(p) => p,
@@ -177,7 +176,7 @@ pub fn parse_duration(duration_str: &str) -> Duration {
     }
 }
 
-pub fn update_path(cwd: &str, mut env: &mut HashMap<String, String>) {
+pub fn update_path(cwd: &str, env: &mut HashMap<String, String>) {
     if !env.contains_key("PATH") {
         env.insert("PATH".to_owned(), "".to_owned());
     }

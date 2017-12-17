@@ -3,4 +3,4 @@ project: bin
 desc: Adding local bin directories.
 tasks:
   path:
-    cmd: echo PATH is {{ PATH }}
+    cmd: echo PATH is {{ .PATH }}

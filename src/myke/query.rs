@@ -1,5 +1,5 @@
-extern crate itertools;
 extern crate glob;
+extern crate itertools;
 extern crate regex;
 
 use self::glob::Pattern;
@@ -20,7 +20,7 @@ pub struct Query {
 }
 
 impl Query {
-    pub fn parse(mut rparams: &mut VecDeque<String>) -> Query {
+    pub fn parse(rparams: &mut VecDeque<String>) -> Query {
         let raw = join(rparams.clone(), " ");
         let cmd = rparams.pop_front().unwrap_or_default();
         let mut cmds: Vec<&str> = cmd.split('/').collect();
@@ -80,8 +80,5 @@ impl Query {
 }
 
 pub fn parse_queries(param_groups: &mut ParamGroups) -> Vec<Query> {
-    param_groups
-        .iter_mut()
-        .map(|mut q| Query::parse(q))
-        .collect()
+    param_groups.iter_mut().map(|q| Query::parse(q)).collect()
 }
