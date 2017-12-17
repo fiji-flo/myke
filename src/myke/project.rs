@@ -1,5 +1,5 @@
-extern crate yaml_rust;
 extern crate itertools;
+extern crate yaml_rust;
 
 use self::yaml_rust::{Yaml, YamlLoader};
 use myke::task::Task;
@@ -52,12 +52,10 @@ impl Project {
                 p.mixin();
                 Ok(p)
             }
-            Err(e) => {
-                Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    format!("ERROR parsing {}: {}", src, e),
-                ))
-            }
+            Err(e) => Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!("ERROR parsing {}: {}", src, e),
+            )),
         }
     }
 
@@ -81,9 +79,7 @@ impl Project {
             self.name.clone(),
             itertools::join(itertools::sorted(&self.tags), ", "),
             itertools::join(
-                itertools::sorted(
-                    self.tasks.keys().filter(|x| !x.starts_with('_')),
-                ),
+                itertools::sorted(self.tasks.keys().filter(|x| !x.starts_with('_'))),
                 ", ",
             ),
         ))
@@ -113,13 +109,11 @@ fn get_file_path(path: &PathBuf) -> String {
 fn extract_string_vec(yml: &Yaml) -> Vec<String> {
     let yaml_vec = yml.as_vec();
     match yaml_vec {
-        Some(yaml_vec) => {
-            yaml_vec
-                .iter()
-                .filter_map(|x| x.as_str())
-                .map(String::from)
-                .collect()
-        }
+        Some(yaml_vec) => yaml_vec
+            .iter()
+            .filter_map(|x| x.as_str())
+            .map(String::from)
+            .collect(),
         _ => Vec::new(),
     }
 }
@@ -127,15 +121,13 @@ fn extract_string_vec(yml: &Yaml) -> Vec<String> {
 fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
     let yaml_vec = yml.as_hash();
     match yaml_vec {
-        Some(yaml_vec) => {
-            yaml_vec
-                .iter()
-                .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
-                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                    _ => None,
-                })
-                .collect()
-        }
+        Some(yaml_vec) => yaml_vec
+            .iter()
+            .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
+                (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                _ => None,
+            })
+            .collect(),
         _ => HashMap::new(),
     }
 }
@@ -143,19 +135,16 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
 fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
     let yaml_vec = yml.as_hash();
     match yaml_vec {
-        Some(yaml_vec) => {
-            yaml_vec
-                .iter()
-                .filter_map(|(k, v)| match k.as_str() {
-                    Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
-                    _ => None,
-                })
-                .collect()
-        }
+        Some(yaml_vec) => yaml_vec
+            .iter()
+            .filter_map(|(k, v)| match k.as_str() {
+                Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
+                _ => None,
+            })
+            .collect(),
         _ => HashMap::new(),
     }
 }
-
 
 pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, Task>) {
     for (k, v) in update {
@@ -166,5 +155,4 @@ pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, T
             base.insert(k.clone(), v.clone());
         }
     }
-
 }

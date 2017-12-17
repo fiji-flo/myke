@@ -1,10 +1,9 @@
-extern crate sprig;
 extern crate gtmpl_value;
+extern crate sprig;
 
 use self::sprig::SPRIG;
 use gtmpl::{Context, Func, Template};
 use std::collections::HashMap;
-
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
@@ -13,14 +12,11 @@ pub fn template_file<T: Iterator<Item = (String, String)>>(
     file: &Path,
     iter: T,
 ) -> Result<String, String> {
-    let mut f = File::open(file).map_err(
-        |e| format!("file not found: {}", e),
-    )?;
+    let mut f = File::open(file).map_err(|e| format!("file not found: {}", e))?;
 
     let mut contents = String::new();
-    f.read_to_string(&mut contents).map_err(|e| {
-        format!("unable to read file: {}", e)
-    })?;
+    f.read_to_string(&mut contents)
+        .map_err(|e| format!("unable to read file: {}", e))?;
     let map: HashMap<String, String> = iter.collect();
     let tmpl = create_template(&contents)?;
     tmpl.render(&Context::from(map)?)

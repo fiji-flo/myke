@@ -1,5 +1,5 @@
-extern crate itertools;
 extern crate glob;
+extern crate itertools;
 extern crate regex;
 
 use self::glob::Pattern;

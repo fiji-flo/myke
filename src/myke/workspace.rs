@@ -33,12 +33,10 @@ impl Workspace {
                 }
                 projects.push(p);
             }
-            Err(e) => {
-                match e.kind() {
-                    io::ErrorKind::NotFound => {}
-                    _ => out!("{}", e),
-                }
-            }
+            Err(e) => match e.kind() {
+                io::ErrorKind::NotFound => {}
+                _ => out!("{}", e),
+            },
         }
     }
 }

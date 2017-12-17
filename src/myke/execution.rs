@@ -97,14 +97,13 @@ impl<'a> Execution<'a> {
             if cmd == "" {
                 return Some(());
             }
-            let mut cmd =
-                match template::template_str(cmd, &self.project.env, &self.query.params) {
-                    Ok(s) => s,
-                    Err(e) => {
-                        out!("{} in {}", e, cmd);
-                        return None;
-                    }
-                };
+            let mut cmd = match template::template_str(cmd, &self.project.env, &self.query.params) {
+                Ok(s) => s,
+                Err(e) => {
+                    out!("{} in {}", e, cmd);
+                    return None;
+                }
+            };
             if let Some(ref shell) = self.task.shell {
                 if shell != "" {
                     cmd = format!("{} {}", shell, cmd);
@@ -129,7 +128,11 @@ impl<'a> Execution<'a> {
                 .arg(&cmd)
                 .current_dir(&self.project.cwd);
             let status = run(&mut command, &format!("failed to execute {}", cmd));
-            if status.success() { Some(()) } else { None }
+            if status.success() {
+                Some(())
+            } else {
+                None
+            }
         } else {
             Some(())
         }

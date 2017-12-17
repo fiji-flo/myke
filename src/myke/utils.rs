@@ -135,7 +135,6 @@ pub fn get_file_path(path: &PathBuf) -> Option<String> {
     }
 }
 
-
 pub fn get_cwd(path: &PathBuf) -> String {
     let full_path = match fs::canonicalize(path) {
         Ok(p) => p,
