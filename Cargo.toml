@@ -11,15 +11,11 @@ humantime = "1"
 regex = "0.2"
 glob = "0.2"
 term_size = "0.3"
-gtmpl = { git = "https://github.com/fiji-flo/gtmpl-rust", branch = "func-revamp" }
-gtmpl_value = { git = "https://github.com/fiji-flo/gtmpl_value", branch = "map-n-novalue" }
-sprig = { git = "https://github.com/fiji-flo/sprig-rust", branch = "defaults" }
-
-[dependencies.lazytable]
-git = "https://github.com/fiji-flo/lazytable.git"
-
-[dependencies.capture]
-path = "capture"
+gtmpl = "0.3"
+gtmpl_value = "0.2"
+sprig = { git = "https://github.com/fiji-flo/sprig-rust" }
+lazytable = { git = "https://github.com/fiji-flo/lazytable.git" }
+capture = { path = "capture" }
 
 [build-dependencies]
 glob = "0.2"

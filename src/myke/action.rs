@@ -13,8 +13,8 @@ use std::path::Path;
 #[cfg(not(test))]
 use std::process;
 
-const VERSION: &'static str = "0.9";
-const USAGE: &'static str = "Usage:
+const VERSION: &str = "0.9";
+const USAGE: &str = "Usage:
   myke [--myke-options] [tag/]task [--task-options] ...
 
 myke options:

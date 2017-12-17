@@ -38,7 +38,7 @@ pub fn load_path(cwd: &str, path: &str) -> String {
 pub fn load_env(env_files: &[String], mut env: &mut HashMap<String, String>) {
     for env_file in env_files {
         merge_env(&mut env, &parse_env_file(env_file), true);
-        let mut local = String::from((*env_file).clone());
+        let mut local = (*env_file).clone();
         local.push_str(".local");
         merge_env(&mut env, &parse_env_file(&local), true);
     }
