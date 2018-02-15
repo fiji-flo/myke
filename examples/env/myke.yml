@@ -31,3 +31,5 @@ tasks:
     cmd: echo envvar from test.env.local is {{ .KEY_ENVFILE_LOCAL }}
   path:
     cmd: echo PATH is {{ .PATH }}
+  system:
+    cmd: echo {{ ._MYKE_ENV_VAR }}

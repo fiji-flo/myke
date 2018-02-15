@@ -69,6 +69,8 @@ macro_rules! myke_test_file {
 #[macro_export]
 macro_rules! myke_test {
     (
+        $(before $before:block)*
+        $(after $after:block)*
         name $name:ident;
         cd $dir:expr;
         $(
@@ -77,6 +79,7 @@ macro_rules! myke_test {
     ) => {
         #[test]
         fn $name() {
+            $($before)*
             let tt = vec!(
                 $(testing::TestTable{
                     desc: "",
@@ -85,6 +88,7 @@ macro_rules! myke_test {
                 },)*
             );
             testing::run_cli_test($dir, &tt);
+            $($after)*
         }
     }
 }
