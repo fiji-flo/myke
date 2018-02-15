@@ -1,6 +1,6 @@
 extern crate glob;
-extern crate tempdir;
 extern crate itertools;
+extern crate tempdir;
 use glob::glob;
 use std::fs;
 use std::fs::File;
