@@ -4,7 +4,7 @@ use myke::task::Task;
 use myke::template;
 use myke::utils;
 use myke::workspace::Workspace;
-#[cfg(windows)]
+use std::collections::HashMap;
 use std::env;
 use std::env::current_exe;
 #[cfg(windows)]
@@ -97,7 +97,9 @@ impl<'a> Execution<'a> {
             if cmd == "" {
                 return Some(());
             }
-            let mut cmd = match template::template_str(cmd, &self.project.env, &self.query.params) {
+            let mut merged_env: HashMap<String, String> = env::vars().collect();
+            utils::merge_env(&mut merged_env, &self.project.env, false);
+            let mut cmd = match template::template_str(cmd, &merged_env, &self.query.params) {
                 Ok(s) => s,
                 Err(e) => {
                     out!("{} in {}", e, cmd);
@@ -110,7 +112,7 @@ impl<'a> Execution<'a> {
                 }
             }
             let mut command = Execution::shell();
-            for (k, v) in &self.project.env {
+            for (k, v) in &merged_env {
                 if k == "PATH" {
                     command.env(k, utils::add_to_path(v));
                 } else {
@@ -151,18 +153,23 @@ fn run(command: &mut Command, error_msg: &str) -> ExitStatus {
     output.status
 }
 
-pub fn execute(w: &Workspace, q: &Query, dry_run: bool, verbose: bool) -> Result<(), String> {
-    let matches = q.search(w);
+pub fn execute(
+    workspace: &Workspace,
+    query: &Query,
+    dry_run: bool,
+    verbose: bool,
+) -> Result<(), String> {
+    let matches = query.search(workspace);
     if matches.is_empty() {
-        return Err(format!("no task matched {}", q.task));
+        return Err(format!("no task matched {}", query.task));
     }
-    for (p, t) in matches {
+    for (project, task) in matches {
         let e = Execution {
-            query: q,
-            project: p,
-            task: t,
-            dry_run: dry_run,
-            verbose: verbose,
+            query,
+            project,
+            task,
+            dry_run,
+            verbose,
         };
         if e.execute().is_none() {
             return Err(String::from("Something went wrong :/"));

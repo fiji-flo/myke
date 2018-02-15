@@ -28,15 +28,15 @@ impl Project {
     pub fn from(path: &PathBuf) -> io::Result<Project> {
         let src = get_file_path(path);
         let cwd = get_cwd(path);
-        let mut file = try!(File::open(&src));
+        let mut file = File::open(&src)?;
         let mut yml_str = String::new();
-        try!(file.read_to_string(&mut yml_str));
+        file.read_to_string(&mut yml_str)?;
         match YamlLoader::load_from_str(&yml_str) {
             Ok(docs) => {
                 let doc = &docs[0];
                 let mut p = Project {
-                    src: src,
-                    cwd: cwd,
+                    src,
+                    cwd,
                     name: val!(doc, "project", ""),
                     desc: val!(doc, "desc", ""),
                     tags: extract_string_vec(&doc["tags"]),

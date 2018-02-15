@@ -20,7 +20,7 @@ pub struct TestTable<'a> {
 #[cfg(test)]
 pub fn run_cli_test<'a>(dir: &str, tests: &[TestTable]) {
     let buf = Mutex::new(vec![]);
-    let cappy = Box::new(Cappy { buf: buf });
+    let cappy = Box::new(Cappy { buf });
     capture::set(cappy);
     for test in tests {
         chdir(dir, &|| {

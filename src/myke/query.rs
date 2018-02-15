@@ -39,10 +39,10 @@ impl Query {
         }
 
         Query {
-            raw: raw,
-            task: task,
-            tags: tags,
-            params: params,
+            raw,
+            task,
+            tags,
+            params,
         }
     }
 
