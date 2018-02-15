@@ -11,13 +11,13 @@ humantime = "1"
 regex = "0.2"
 glob = "0.2"
 term_size = "0.3"
-gtmpl = "0.3"
-gtmpl_value = "0.2"
+gtmpl = "0.4.1"
+gtmpl_value = "0.3"
+lazytable = "0.1"
 sprig = { git = "https://github.com/fiji-flo/sprig-rust" }
-lazytable = { git = "https://github.com/fiji-flo/lazytable.git" }
 capture = { path = "capture" }
 
 [build-dependencies]
 glob = "0.2"
-itertools = "0"
+itertools = "0.7"
 tempdir = "0.3"
