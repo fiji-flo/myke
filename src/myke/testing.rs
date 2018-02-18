@@ -20,7 +20,7 @@ pub struct TestTable<'a> {
 #[cfg(test)]
 pub fn run_cli_test<'a>(dir: &str, tests: &[TestTable]) {
     let buf = Mutex::new(vec![]);
-    let cappy = Box::new(Cappy { buf: buf });
+    let cappy = Box::new(Cappy { buf });
     capture::set(cappy);
     for test in tests {
         chdir(dir, &|| {
@@ -69,6 +69,8 @@ macro_rules! myke_test_file {
 #[macro_export]
 macro_rules! myke_test {
     (
+        $(before $before:block)*
+        $(after $after:block)*
         name $name:ident;
         cd $dir:expr;
         $(
@@ -77,6 +79,7 @@ macro_rules! myke_test {
     ) => {
         #[test]
         fn $name() {
+            $($before)*
             let tt = vec!(
                 $(testing::TestTable{
                     desc: "",
@@ -85,6 +88,7 @@ macro_rules! myke_test {
                 },)*
             );
             testing::run_cli_test($dir, &tt);
+            $($after)*
         }
     }
 }

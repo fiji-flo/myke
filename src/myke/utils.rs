@@ -44,12 +44,16 @@ pub fn load_env(env_files: &[String], mut env: &mut HashMap<String, String>) {
     }
 }
 
-pub fn merge_env(env: &mut HashMap<String, String>, update: &HashMap<String, String>, over: bool) {
+pub fn merge_env(
+    env: &mut HashMap<String, String>,
+    update: &HashMap<String, String>,
+    use_original_path: bool,
+) {
     for (k, v) in update {
         if k == "PATH" {
             let path = match env.get(k) {
                 Some(path) => {
-                    if over {
+                    if use_original_path {
                         prepend_path(path, v)
                     } else {
                         prepend_path(v, path)
@@ -58,7 +62,7 @@ pub fn merge_env(env: &mut HashMap<String, String>, update: &HashMap<String, Str
                 None => v.clone(),
             };
             env.insert(k.clone(), path);
-        } else if over || !env.contains_key(k) {
+        } else if use_original_path || !env.contains_key(k) {
             env.insert(k.clone(), v.clone());
         }
     }

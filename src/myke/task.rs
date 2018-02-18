@@ -22,7 +22,7 @@ impl Task {
     pub fn parse(name: String, yaml: &Yaml) -> Task {
         let dur = val!(yaml, "retry_delay", "1s");
         Task {
-            name: name,
+            name,
             desc: val_opt!(yaml, "desc"),
             cmd: val_opt!(yaml, "cmd"),
             before: val_opt!(yaml, "before"),
