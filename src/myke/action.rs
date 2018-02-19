@@ -13,7 +13,7 @@ use std::path::Path;
 #[cfg(not(test))]
 use std::process;
 
-const VERSION: &str = "0.9";
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const USAGE: &str = "Usage:
   myke [--myke-options] [tag/]task [--task-options] ...
 
