@@ -32,7 +32,7 @@ impl Workspace {
             }
             Err(e) => match e.kind() {
                 io::ErrorKind::NotFound => {}
-                _ => out!("{}", e),
+                _ => error!("{}", e),
             },
         }
     }

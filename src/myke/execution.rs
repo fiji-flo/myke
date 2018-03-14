@@ -1,4 +1,3 @@
-use colored::*;
 use myke::project::Project;
 use myke::query::Query;
 use myke::task::Task;
@@ -28,10 +27,10 @@ impl<'a> Execution<'a> {
     pub fn execute(&'a self) -> Result<(), String> {
         let name = format!("{}/{}", self.project.name, self.task.name);
         if self.dry_run {
-            out!("{}: Will run", name);
+            info!("{}: Will run", name);
             return Ok(());
         }
-        out!("{} Running {}", "•".blue(), name);
+        info!("Running {}", name);
         let now = Instant::now();
         let status = self.retry();
         let took = now.elapsed();
@@ -42,17 +41,17 @@ impl<'a> Execution<'a> {
             w = 6
         );
         match status {
-            Ok(_) => out!("{} {}: Completed, Took: {}", "•".blue(), name, took),
-            _ => out!("{} {}: Failed, Took: {}", "⨯".red(), name, took),
+            Ok(_) => info!("{}: Completed, Took: {}", name, took),
+            _ => error!("{}: Failed, Took: {}", name, took),
         }
         status
     }
 
     fn print_task_error(&'a self, err: &str) {
-        out!("{} {}", "⨯".red(), err);
+        error!(err);
         if let Some(ref err) = self.task.error {
             if !err.is_empty() {
-                out!("{} {}", "⨯".red(), err);
+                error!(err);
             }
         }
     }
@@ -64,9 +63,8 @@ impl<'a> Execution<'a> {
         };
         for i in 0..self.task.retry {
             if self.verbose {
-                out!(
-                    "{} {}/{}: Failed, Retrying {}/{} in {}",
-                    "•".blue(),
+                info!(
+                    "{}/{}: Failed, Retrying {}/{} in {}",
                     self.project.name,
                     self.task.name,
                     i + 1,
