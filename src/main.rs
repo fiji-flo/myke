@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[macro_use]
 extern crate capture;
-#[macro_use]
+extern crate colored;
 extern crate gtmpl;
 mod myke;
 

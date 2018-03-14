@@ -38,11 +38,12 @@ test_script:
       cargo test --target %TARGET% -- --nocapture --test-threads=1 &&
       cargo test --target %TARGET% --release -- --nocapture --test-threads=1&&
       cargo run --target %TARGET% &&
-      cargo run --target %TARGET% --release
+      cargo run --target %TARGET% --release &&
+      cargo run --target %TARGET% --release --features colored/no-color
     )
 
 before_deploy:
-  - cargo build --target %TARGET% --release
+  - cargo build --target %TARGET% --release --features colored/no-color
   - ps: ci\before_deploy.ps1
 
 deploy:

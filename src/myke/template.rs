@@ -2,7 +2,7 @@ extern crate gtmpl_value;
 extern crate sprig;
 
 use self::sprig::SPRIG;
-use gtmpl::{Context, Func, Template};
+use gtmpl::{Context, Func, Template, Value};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
@@ -46,12 +46,11 @@ fn create_template(string: &str) -> Result<Template, String> {
     Ok(tmpl)
 }
 
-gtmpl_fn!(
-    fn required(arg: String) -> Result<String, String> {
-        if arg.is_empty() {
-            Err(String::from("missing required argument"))
-        } else {
-            Ok(arg)
+fn required(args: &[Value]) -> Result<Value, String> {
+    if let Some(&Value::String(ref s)) = args.get(0) {
+        if !s.is_empty() {
+            return Ok(Value::from(s));
         }
     }
-);
+    Err(String::from("missing required argument"))
+}
