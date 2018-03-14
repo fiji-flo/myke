@@ -28,6 +28,7 @@ impl<'a> Execution<'a> {
         let name = format!("{}/{}", self.project.name, self.task.name);
         if self.dry_run {
             out!("{}: Will run", name);
+            return Some(());
         }
         let now = Instant::now();
         let status = self.retry();
