@@ -48,7 +48,9 @@ impl<'a> Execution<'a> {
     }
 
     fn print_task_error(&'a self, err: &str) {
-        error!(err);
+        if self.verbose {
+            error!(err);
+        }
         if let Some(ref err) = self.task.error {
             if !err.is_empty() {
                 error!(err);
@@ -79,7 +81,7 @@ impl<'a> Execution<'a> {
             };
         }
         self.print_task_error(&status);
-        Err(String::default())
+        Err(String::from(status))
     }
 
     fn execute_task(&'a self) -> Result<(), String> {
@@ -182,8 +184,7 @@ pub fn execute(
             dry_run,
             verbose,
         };
-        e.execute()
-            .map_err(|_| String::from("Something went wrong :/"))?;
+        e.execute()?;
     }
     Ok(())
 }
