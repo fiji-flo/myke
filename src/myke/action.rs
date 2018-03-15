@@ -59,7 +59,7 @@ fn template(path: &str) {
     match template::template_file(p, env::vars()) {
         Ok(s) => out!("{}", s),
         Err(e) => {
-            out!("[TEMPLATE_ERROR]: parsing error {}", e);
+            error!("[TEMPLATE_ERROR]: parsing error {}", e);
             #[cfg(not(test))]
             process::exit(1);
         }
@@ -75,7 +75,7 @@ fn run(path: &str, mut param_groups: utils::ParamGroups, dry_run: bool, verbose:
     for query in queries {
         if let Err(e) = execution::execute(&workspace, &query, dry_run, verbose) {
             if verbose {
-                out!("[EXECUTION_ERROR]: {}", e);
+                error!("[EXECUTION_ERROR]: {}", e);
             }
             #[cfg(not(test))]
             process::exit(1);

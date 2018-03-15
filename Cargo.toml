@@ -1,10 +1,11 @@
 [package]
 name = "myke"
-version = "0.9.8"
+version = "0.9.9"
 authors = ["Florian Merz <flomerz@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
+colored = "1.6"
 yaml-rust = "0.4"
 itertools = "0.7"
 humantime = "1"

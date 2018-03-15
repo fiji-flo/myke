@@ -49,3 +49,35 @@ macro_rules! out {
     ($fmt:expr) => (capture!($fmt));
     ($fmt:expr, $($arg:tt)*) => (capture!($fmt, $($arg)*));
 }
+
+#[macro_export]
+macro_rules! info {
+    () => ({
+        use ::colored::*;
+        out!("•".blue());
+    });
+    ($str:expr) => ({
+        use ::colored::*;
+        out!("{} {}", "•".blue(), $str);
+    });
+    ($fmt:expr, $($arg:tt)*) => ({
+        use ::colored::*;
+        out!("{} {}", "•".blue(), format_args!($fmt, $($arg)*));
+    });
+}
+
+#[macro_export]
+macro_rules! error {
+    () => ({
+        use ::colored::*;
+        out!("⨯".red());
+    });
+    ($str:expr) => ({
+        use ::colored::*;
+        out!("{} {}", "⨯".red(), $str);
+    });
+    ($fmt:expr, $($arg:tt)*) => ({
+        use ::colored::*;
+        out!("{} {}", "⨯".red(), format_args!($fmt, $($arg)*));
+    });
+}
