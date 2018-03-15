@@ -136,7 +136,7 @@ impl<'a> Execution<'a> {
                 .env("MYKE_CWD", &self.project.cwd)
                 .arg(&cmd)
                 .current_dir(&self.project.cwd);
-            let status = run(&mut command, format!("failed to execute {}", cmd))?;
+            let status = run(&mut command, &format!("failed to execute {}", cmd))?;
             if status.success() {
                 Ok(())
             } else {
@@ -149,14 +149,14 @@ impl<'a> Execution<'a> {
 }
 
 #[cfg(not(test))]
-fn run(command: &mut Command, error_msg: String) -> Result<ExitStatus, String> {
+fn run(command: &mut Command, error_msg: &str) -> Result<ExitStatus, String> {
     command
         .status()
         .map_err(|e| format!("{}: {}", error_msg, e))
 }
 
 #[cfg(test)]
-fn run(command: &mut Command, error_msg: String) -> Result<ExitStatus, String> {
+fn run(command: &mut Command, error_msg: &str) -> Result<ExitStatus, String> {
     let output = command
         .output()
         .map_err(|e| format!("{}: {}", error_msg, e))?;
