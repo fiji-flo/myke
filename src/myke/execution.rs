@@ -172,7 +172,7 @@ pub fn execute(
 ) -> Result<(), String> {
     let matches = query.search(workspace);
     if matches.is_empty() {
-        return Err(format!("no task matched {}", query.task));
+        return Err(format!("no task matched: {}", query.task));
     }
     for (project, task) in matches {
         let e = Execution {

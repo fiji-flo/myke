@@ -7,4 +7,5 @@ myke_test!(
     "myke" => r"\s*tasks\s*\|\s*\|\s*visible\s*\n.*";
     "myke visible" => "visible";
     "myke _hidden" => "hidden";
+    "myke wrong" => r".*error running command: no task matched: wrong.*";
 );
