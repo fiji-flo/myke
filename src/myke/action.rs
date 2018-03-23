@@ -13,21 +13,7 @@ use std::path::Path;
 #[cfg(not(test))]
 use std::process;
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-const USAGE: &str = "Usage:
-  myke [--myke-options] [tag/]task [--task-options] ...
-
-myke options:
-  --file=     yml file to load (default: myke.yml)
-  --dry-run   print tasks without running them
-  --version   print myke version
-  --template= template file to render
-  --license   show open source licenses
-  --verbose   show slightly more output
-
-Help Options:
-  --help      Show this help message
-";
+use clap::ArgMatches;
 
 #[derive(Debug)]
 enum Action {
@@ -35,22 +21,18 @@ enum Action {
     DryRun(String),
     VerboseRun(String),
     Help,
-    Version,
-    Licenses,
     Template(String),
 }
 
-pub fn action(mut param_groups: utils::ParamGroups) {
-    let a = parse(&param_groups.pop_front().unwrap());
+pub fn action(args: &ArgMatches, queries: utils::ParamGroups) {
+    let a = parse(args);
 
     match a {
-        Action::Help => out!("{}", USAGE),
-        Action::Version => out!("{}", VERSION),
-        Action::DryRun(file) => run(&file, param_groups, true, false),
-        Action::VerboseRun(file) => run(&file, param_groups, false, true),
-        Action::Run(file) => run(&file, param_groups, false, false),
+        Action::Help => out!("{}", args.usage()),
+        Action::DryRun(file) => run(&file, queries, true, false),
+        Action::VerboseRun(file) => run(&file, queries, false, true),
+        Action::Run(file) => run(&file, queries, false, false),
         Action::Template(file) => template(&file),
-        _ => {}
     }
 }
 
@@ -105,28 +87,20 @@ pub fn list(workspace: &Workspace) {
     out!("{}", table);
 }
 
-fn parse(options: &VecDeque<String>) -> Action {
-    if options.has("--help") || options.has("-h") {
+fn parse(args: &ArgMatches) -> Action {
+    if args.is_present("help") {
         return Action::Help;
     }
-    if options.has("--licenses") {
-        return Action::Licenses;
-    }
-    if options.has("--version") {
-        return Action::Version;
-    }
-    if let Some(file) = options.get_by_prefix("--template=") {
-        return Action::Template(file);
+    if let Some(file) = args.value_of("template") {
+        return Action::Template(file.into());
     }
 
-    let file = options
-        .get_by_prefix("--file=")
-        .unwrap_or_else(|| String::from("myke.yml"));
+    let file = args.value_of("file").unwrap_or_else(|| "myke.yml").into();
 
-    if options.has("--dry-run") || options.has("-n") {
+    if args.is_present("dry-run") {
         return Action::DryRun(file);
     }
-    if options.has("--verbose") || options.has("-n") {
+    if args.is_present("verbose") {
         return Action::VerboseRun(file);
     }
     Action::Run(file)

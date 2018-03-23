@@ -81,7 +81,7 @@ impl<'a> Execution<'a> {
             };
         }
         self.print_task_error(&status);
-        Err(String::from(status))
+        Err(status)
     }
 
     fn execute_task(&'a self) -> Result<(), String> {

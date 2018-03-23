@@ -5,6 +5,7 @@ authors = ["Florian Merz <flomerz@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
+clap = "2.31"
 colored = "1.6"
 yaml-rust = "0.4"
 itertools = "0.7"
