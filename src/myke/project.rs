@@ -107,43 +107,43 @@ fn get_file_path(path: &PathBuf) -> String {
 }
 
 fn extract_string_vec(yml: &Yaml) -> Vec<String> {
-    let yaml_vec = yml.as_vec();
-    match yaml_vec {
-        Some(yaml_vec) => yaml_vec
-            .iter()
-            .filter_map(|x| x.as_str())
-            .map(String::from)
-            .collect(),
-        _ => Vec::new(),
-    }
+    yml.as_vec()
+        .map(|yaml_vec| {
+            yaml_vec
+                .iter()
+                .filter_map(|x| x.as_str())
+                .map(String::from)
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
-    let yaml_vec = yml.as_hash();
-    match yaml_vec {
-        Some(yaml_vec) => yaml_vec
-            .iter()
-            .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
-                (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
-                _ => None,
-            })
-            .collect(),
-        _ => HashMap::new(),
-    }
+    yml.as_hash()
+        .map(|yaml_vec| {
+            yaml_vec
+                .iter()
+                .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
+                    (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
+                    _ => None,
+                })
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
-    let yaml_vec = yml.as_hash();
-    match yaml_vec {
-        Some(yaml_vec) => yaml_vec
-            .iter()
-            .filter_map(|(k, v)| match k.as_str() {
-                Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
-                _ => None,
-            })
-            .collect(),
-        _ => HashMap::new(),
-    }
+    yml.as_hash()
+        .map(|yaml_vec| {
+            yaml_vec
+                .iter()
+                .filter_map(|(k, v)| match k.as_str() {
+                    Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
+                    _ => None,
+                })
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, Task>) {
