@@ -1,13 +1,15 @@
 #[macro_export]
 macro_rules! val {
-    ($yml:ident, $yml_key:expr, $default:expr) =>
-        (String::from($yml[$yml_key].as_str().unwrap_or($default)))
+    ($yml:ident, $yml_key:expr, $default:expr) => {
+        String::from($yml[$yml_key].as_str().unwrap_or($default))
+    };
 }
 
 #[macro_export]
 macro_rules! val_opt {
-    ($yml:ident, $yml_key:expr) =>
-        ($yml[$yml_key].as_str().and_then(|s| {Some(s.to_owned())}))
+    ($yml:ident, $yml_key:expr) => {
+        $yml[$yml_key].as_str().and_then(|s| Some(s.to_owned()))
+    };
 }
 
 #[macro_export]
@@ -16,7 +18,7 @@ macro_rules! update_task {
         if $self_.$field.is_none() {
             $self_.$field = $update.$field.clone();
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -29,9 +31,9 @@ macro_rules! concat_task {
             (Some(s), Some(u)) => Some(format!("{} & {}", s, u)),
             (Some(s), None) => Some(s),
             (None, Some(u)) => Some(u),
-            _ => None
+            _ => None,
         }
-    }
+    };
 }
 
 #[cfg(not(test))]

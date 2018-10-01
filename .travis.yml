@@ -27,23 +27,25 @@ matrix:
     - env: TARGET=x86_64-apple-darwin
       os: osx
       rust: nightly
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
 
 before_install: set -e
 
 install:
-  - if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then (cargo install clippy --force && export CLIPPY="check" || true) fi
-  - export PATH=$HOME/.cargo/bin:$PATH
   - sh ci/install.sh
   - source ~/.cargo/env || true
 
 before_script:
   - rustup component add rustfmt-preview
+  - rustup component add clippy-preview
 
 script:
-  - cargo fmt --all -- --write-mode diff
+  - cargo fmt --all -- --check
   # fmt doc triggers build.rs and generates test (HACK)
   - cargo doc
-  - if [ "$CLIPPY" = "check" ]; then (cargo clippy) fi
+  - cargo clippy
   - bash ci/script.sh
 
 after_script: set +e

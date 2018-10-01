@@ -34,12 +34,7 @@ impl<'a> Execution<'a> {
         let now = Instant::now();
         let status = self.retry();
         let took = now.elapsed();
-        let took = format!(
-            "{}.{:>0w$}s",
-            took.as_secs(),
-            took.subsec_nanos() / 1000,
-            w = 6
-        );
+        let took = format!("{}.{:>0w$}s", took.as_secs(), took.subsec_micros(), w = 6);
         match status {
             Ok(_) => info!("{}: Completed, Took: {}", name, took),
             _ => error!("{}: Failed, Took: {}", name, took),
@@ -81,7 +76,7 @@ impl<'a> Execution<'a> {
             };
         }
         self.print_task_error(&status);
-        Err(String::from(status))
+        Err(status)
     }
 
     fn execute_task(&'a self) -> Result<(), String> {
@@ -132,8 +127,7 @@ impl<'a> Execution<'a> {
                 .env(
                     "myke",
                     current_exe().unwrap_or_else(|_| PathBuf::from("myke")),
-                )
-                .env("MYKE_PROJECT", &self.project.name)
+                ).env("MYKE_PROJECT", &self.project.name)
                 .env("MYKE_TASK", &self.task.name)
                 .env("MYKE_CWD", &self.project.cwd)
                 .arg(&cmd)

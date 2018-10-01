@@ -51,9 +51,14 @@ fn chdir(dir: &str, f: &Fn()) {
 
 #[cfg(test)]
 fn run(args: &str) {
-    let argv = args.split(" ").map(|s| s.to_owned()).collect();
-    let params_groups = utils::parse_param_groups(argv);
-    action::action(params_groups);
+    let argv = args.split(" ").map(|s| s.to_owned());
+
+    let matches = utils::parse_args(argv);
+    let queries = matches
+        .values_of("tasks")
+        .map(utils::parse_task_groups)
+        .unwrap_or_default();
+    action::action(&matches, queries);
 }
 
 #[cfg(test)]
@@ -62,7 +67,7 @@ macro_rules! myke_test_file {
     () => {
         #[cfg(test)]
         use myke::testing;
-    }
+    };
 }
 
 #[cfg(test)]

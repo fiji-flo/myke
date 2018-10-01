@@ -53,7 +53,7 @@ pub struct Cappy {
 
 impl Out for Cappy {
     fn out(&self, frag: String) {
-        let _ = self.buf.lock().unwrap().push(frag);
+        self.buf.lock().unwrap().push(frag);
     }
     fn dump(&self) -> Option<String> {
         match self.buf.lock() {

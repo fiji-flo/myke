@@ -1,8 +1,8 @@
 /* This is a collection of some helper functions that don't depend on myke of external crates. */
-
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
+use std::ffi::OsString;
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
@@ -11,7 +11,53 @@ use std::iter::Iterator;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+use clap::{App, AppSettings, Arg, ArgMatches};
+
 pub type ParamGroups = VecDeque<VecDeque<String>>;
+
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+pub fn parse_args<'a, I, T>(itr: I) -> ArgMatches<'a>
+where
+    I: IntoIterator<Item = T>,
+    T: Into<OsString> + Clone,
+{
+    App::new("myke")
+        .about("✔ myke - just run it")
+        .version(VERSION)
+        .author("Florian Merz <flomerz@gmail.com>")
+        .setting(AppSettings::TrailingVarArg)
+        .arg(
+            Arg::with_name("file")
+                .short("f")
+                .long("file")
+                .value_name("FILE")
+                .help("yml FILE to load (default: myke.yml)")
+                .takes_value(true),
+        ).arg(
+            Arg::with_name("dry-run")
+                .short("n")
+                .long("dry-run")
+                .help("print tasks without running them"),
+        ).arg(
+            Arg::with_name("template")
+                .short("t")
+                .long("template")
+                .value_name("FILE")
+                .help("render a template FILE")
+                .takes_value(true),
+        ).arg(
+            Arg::with_name("verbose")
+                .short("v")
+                .long("verbose")
+                .help("show slightly more output"),
+        ).arg(
+            Arg::with_name("tasks")
+                .allow_hyphen_values(true)
+                .multiple(true)
+                .help("tasks to run"),
+        ).get_matches_from(itr)
+}
 
 pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
     let mut env = String::from(src.trim_right_matches(".yml"));
@@ -26,8 +72,7 @@ pub fn load_path(cwd: &str, path: &str) -> String {
                 return Path::new(cwd).join(p);
             }
             p
-        })
-        .collect::<Vec<_>>();
+        }).collect::<Vec<_>>();
     paths.push(Path::new(cwd).join("bin"));
     match env::join_paths(paths) {
         Ok(s) => s.into_string().unwrap_or_else(|_| path.to_owned()),
@@ -80,8 +125,7 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
                     .filter_map(|(k, v)| match (k, v) {
                         (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
                         _ => None,
-                    })
-                    .collect::<Vec<(String, String)>>();
+                    }).collect::<Vec<(String, String)>>();
                 return HashMap::from_iter(env_vec);
             }
             Err(e) => {
@@ -110,11 +154,14 @@ pub fn prepend_path(path: &str, update: &str) -> String {
     }
 }
 
-pub fn parse_param_groups(args: Vec<String>) -> ParamGroups {
+pub fn parse_task_groups<S, T: Iterator<Item = S>>(args: T) -> ParamGroups
+where
+    S: Into<String>,
+{
     let mut queries = VecDeque::new();
     let mut current = VecDeque::new();
 
-    for arg in args {
+    for arg in args.map(|s| s.into()) {
         if !arg.starts_with("--") && !current.is_empty() {
             queries.push_back(current);
             current = VecDeque::new();

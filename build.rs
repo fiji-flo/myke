@@ -13,8 +13,7 @@ fn main() {
         .filter_map(|entry| match entry {
             Ok(path) => copy(&path),
             _ => None,
-        })
-        .map(|file_name| convert(file_name))
+        }).map(|file_name| convert(file_name))
         .collect::<Vec<String>>();
     make_mod(&tests);
 }

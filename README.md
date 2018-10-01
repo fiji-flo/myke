@@ -6,12 +6,18 @@ Development scripts usually begin as a simple shell wrapper with switch cases (`
 
 myke solves all these problems in a single tiny binary, to avoid reinventing the same stuff over and over again.
 
+## Rust Fork
+
+_Why forking myke and re-writing it in Rust?_
+
+No good reason. Rust is fun and safe, Golang isn't.
+
 ## Features
 
 * Define tasks in simple `.yml` files
 * Nice aggregation and discovery, suitable for large number of tasks (across repos/projects), grouping by tags, etc
 * Robust environment handling - Can be defined as keys in the YML or as dotenv files, overridden by dotenv.local files, `PATH` is always prepended, shell always takes precedence
-* Built-in templating using golang text/template and 50+ functions provided by [sprig](https://github.com/Masterminds/sprig)
+* Built-in templating using [gtmpl](https://crates.io/crates/gtmpl) (golang text/template for Rust) and 30+ functions provided by [sprig-rust](https://github.com/fiji-flo/sprig-rust)
 * Mixin ymls to share tasks, envvars, etc
 * Runtime arguments like `myke task1 --key1=val1 task2 --key2=val2 ...`
 * `before/after/error` hooks to perform cleanups, chains with mixins, etc
@@ -45,7 +51,7 @@ Using the above myke.yml, you can invoke tasks like:
 
 ## Installation
 
-* [Grab the latest release](https://github.com/goeuro/myke/releases/latest)
+* [Grab the latest release](https://github.com/fiji-flo/myke/releases/latest)
 
 ## Examples
 
@@ -101,13 +107,3 @@ In that sense, `myke` is never a build or deployment tool, its just a task aggre
 * `capistrano` `fabric` `...` myke is not a deployment tool for remote machines, and does not do anything over SSH
 * `ansible` `salt` `...` myke is not a configuration management tool, its a task runner
 * [`robo`](https://github.com/tj/robo) is the closest relative to myke, you should check it out as well
-
-## Development
-
-Use docker/docker-compose to develop. You don't need to have golang installed.
-
-* `docker-compose build` Builds and runs tests
-* `docker-compose up` Produces `bin` folder with executables
-* `docker-compose run --rm default /bin/bash` Gives you a terminal inside the container, from where you can run go commands like:
-  * `go test ./...` Runs all tests
-  * `go run main.go` Compiles and runs main
