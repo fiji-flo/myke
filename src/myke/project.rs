@@ -1,7 +1,6 @@
 extern crate itertools;
 extern crate yaml_rust;
 
-use self::yaml_rust::{Yaml, YamlLoader};
 use myke::task::Task;
 use myke::utils::*;
 use std::collections::HashMap;
@@ -10,6 +9,7 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
+use yaml_rust::{Yaml, YamlLoader};
 
 pub struct Project {
     pub src: String,
@@ -114,8 +114,7 @@ fn extract_string_vec(yml: &Yaml) -> Vec<String> {
                 .filter_map(|x| x.as_str())
                 .map(String::from)
                 .collect()
-        })
-        .unwrap_or_default()
+        }).unwrap_or_default()
 }
 
 fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
@@ -126,10 +125,8 @@ fn extract_string_map(yml: &Yaml) -> HashMap<String, String> {
                 .filter_map(|(k, v)| match (k.as_str(), v.as_str()) {
                     (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
                     _ => None,
-                })
-                .collect()
-        })
-        .unwrap_or_default()
+                }).collect()
+        }).unwrap_or_default()
 }
 
 fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
@@ -140,10 +137,8 @@ fn extract_task_map(yml: &Yaml) -> HashMap<String, Task> {
                 .filter_map(|(k, v)| match k.as_str() {
                     Some(k) => Some((String::from(k), Task::parse(String::from(k), v))),
                     _ => None,
-                })
-                .collect()
-        })
-        .unwrap_or_default()
+                }).collect()
+        }).unwrap_or_default()
 }
 
 pub fn update_tasks(base: &mut HashMap<String, Task>, update: &HashMap<String, Task>) {

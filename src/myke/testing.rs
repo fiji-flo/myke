@@ -67,7 +67,7 @@ macro_rules! myke_test_file {
     () => {
         #[cfg(test)]
         use myke::testing;
-    }
+    };
 }
 
 #[cfg(test)]

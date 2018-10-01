@@ -1,5 +1,4 @@
 /* This is a collection of some helper functions that don't depend on myke of external crates. */
-
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
@@ -35,34 +34,29 @@ where
                 .value_name("FILE")
                 .help("yml FILE to load (default: myke.yml)")
                 .takes_value(true),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("dry-run")
                 .short("n")
                 .long("dry-run")
                 .help("print tasks without running them"),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("template")
                 .short("t")
                 .long("template")
                 .value_name("FILE")
                 .help("render a template FILE")
                 .takes_value(true),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("verbose")
                 .short("v")
                 .long("verbose")
                 .help("show slightly more output"),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("tasks")
                 .allow_hyphen_values(true)
                 .multiple(true)
                 .help("tasks to run"),
-        )
-        .get_matches_from(itr)
+        ).get_matches_from(itr)
 }
 
 pub fn add_env_file(src: &str, env_files: &mut Vec<String>) {
@@ -78,8 +72,7 @@ pub fn load_path(cwd: &str, path: &str) -> String {
                 return Path::new(cwd).join(p);
             }
             p
-        })
-        .collect::<Vec<_>>();
+        }).collect::<Vec<_>>();
     paths.push(Path::new(cwd).join("bin"));
     match env::join_paths(paths) {
         Ok(s) => s.into_string().unwrap_or_else(|_| path.to_owned()),
@@ -132,8 +125,7 @@ pub fn parse_env_file(path: &str) -> HashMap<String, String> {
                     .filter_map(|(k, v)| match (k, v) {
                         (Some(k), Some(v)) => Some((String::from(k), String::from(v))),
                         _ => None,
-                    })
-                    .collect::<Vec<(String, String)>>();
+                    }).collect::<Vec<(String, String)>>();
                 return HashMap::from_iter(env_vec);
             }
             Err(e) => {
